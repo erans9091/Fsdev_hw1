@@ -12,6 +12,7 @@ body {
   justify-content: center;
   min-height: 100vh;
 }
+
 /*center titles*/
 h1,
 h2,
@@ -38,6 +39,7 @@ h6 {
 .pagination button.current {
   background-color: #0e47f1;
   color: white;
+  font-weight: bold;
 }
 
 .pagination button:hover {
@@ -49,6 +51,7 @@ h6 {
   display: flex;
   flex-direction: column;
 }
+
 .post {
   display: flex;
   flex-direction: column;
