@@ -12,8 +12,9 @@ const Page = ({
     <div className="page">
       <h1>Page {pageNumber}</h1>
       {posts.map((post) => (
-        <Post post={post} key = {post.id}/>
+        <Post post={post} key={post.id} />
       ))}
+      <button>add new note</button>
     </div>
   );
 };
