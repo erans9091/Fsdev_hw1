@@ -1,19 +1,37 @@
-const mongoose = require("mongoose");
-const express = require("express");
-const dotenv = require("dotenv");
+import express from "express";
+import mongoose from "mongoose";
+import dotenv from "dotenv";
+import cors from "cors";
+
+dotenv.config();
+const port = process.env.PORT;
+// const mongoose = require("mongoose");
+// const express = require("express");
+// const dotenv = require("dotenv");
 const app = express();
-const port = 3001;
+const corsOptions = {
+  origin: "http://localhost:3000",
+  optionsSuccessStatus: 200,
+};
+
+app.use(cors(corsOptions));
 
 const password = process.argv[2];
 
-const url = `mongodb+srv://FsDev:${password}@notes.ve3ednu.mongodb.net/?retryWrites=true&w=majority&appName=notes`;
+const url = process.env.URL!.replace("<password>", password);
 
 mongoose.set("strictQuery", false);
 
-mongoose.connect(url);
+mongoose
+  .connect(url)
+  .then(() => {
+    console.log("connected to MongoDB");
+  })
+  .catch((error) => {
+    console.log("failed to connect to MongoDB!\n", error);
+  });
 
 const noteSchema = new mongoose.Schema({
-  id: Number,
   title: String,
   author:
     {
@@ -25,15 +43,19 @@ const noteSchema = new mongoose.Schema({
 
 const Note = mongoose.model("Note", noteSchema);
 
-const note = new Note({
-  id: 1,
-  title: "Note 1",
-  author: {
-    name: "Author 1",
-    email: "author1@gmail.com",
-  },
-  content: "This is the first note",
-});
+// Note.countDocuments({}).then((result) => {
+// console.log("totalNotes", result);
+// });
+
+// const note = new Note({
+//   id: 1,
+//   title: "Note 1",
+//   author: {
+//     name: "Author 1",
+//     email: "author1@gmail.com",
+//   },
+//   content: "This is the first note",
+// });
 
 // note.save().then((result:Result) => {
 //     console.log("result", result);
@@ -41,12 +63,32 @@ const note = new Note({
 //   mongoose.connection.close();
 // });
 
-app.get("/notes", (req, res) => {
-  const { _page: page, _limit: limit } = req.query;
-  Note.find({}).then((result: any) => {
-    res.json(result);
-    mongoose.connection.close();
-  });
+
+
+noteSchema.set('toJSON', {
+  transform: (document, returnedObject) => {
+    returnedObject.id = returnedObject._id.toString()
+    delete returnedObject._id
+    delete returnedObject.__v
+  }
+})
+
+app.get("/notes", async (req, res) => {
+  console.log("recieved a request from: ", req.url);
+  const { _page, _limit } = req.query;
+  const page = parseInt(_page as string) || 1;
+  const limit = parseInt(_limit as string) || 10;
+  const skip = (page - 1) * limit;
+
+  const notes = await Note.find({}).skip(skip).limit(limit);
+
+  // Get total note count
+  const totalNotes = await Note.countDocuments({});
+
+  res.header("Access-Control-Expose-Headers", "x-total-count");
+  res.setHeader("x-total-count", totalNotes.toString());
+
+  res.json(notes);
 });
 
 app.get("/", (req, res) => {

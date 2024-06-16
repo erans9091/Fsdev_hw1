@@ -21,7 +21,8 @@ const App = () => {
   useEffect(() => {
     fetch(NOTES_URL + `?_page=${currPage}` + `&_limit=${postsPerPage}`)
       .then((res) => {
-        setTotalPosts(res.headers.get("x-total-count"));
+
+        res.headers.get("x-total-count") && setTotalPosts(+res.headers.get("x-total-count")!);
         return res.json();
       })
       .then((data) => {
