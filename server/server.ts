@@ -5,9 +5,7 @@ import cors from "cors";
 
 dotenv.config();
 const port = process.env.PORT;
-// const mongoose = require("mongoose");
-// const express = require("express");
-// const dotenv = require("dotenv");
+
 const app = express();
 const corsOptions = {
   origin: "http://localhost:3000",
@@ -90,6 +88,9 @@ app.get("/notes", async (req, res) => {
 
   res.json(notes);
 });
+
+app.get("/notes/:ith", async (req, res) => { // Get the i'th note
+  
 
 app.get("/", (req, res) => {
   res.send("server is running!");
