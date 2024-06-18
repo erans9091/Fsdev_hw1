@@ -14,7 +14,7 @@ mongoose
   .then(() => {
     console.log("connected to MongoDB");
   })
-  .catch((error) => {
+  .catch((error: any) => {
     console.log("failed to connect to MongoDB!\n", error);
   });
 
@@ -39,26 +39,26 @@ const fillDBFromJSON = () => {
   for (let note of notesFile.notes) {
 
     const newNote = new Note({
-        id: note.id,
-        title: note.title,
-        author: note.author,
-        content: note.content,
+      id: note.id,
+      title: note.title,
+      author: note.author,
+      content: note.content,
     });
 
-    newNote.save().then((result) => {
-        console.log("Note saved successfully!");
+    newNote.save().then((result: any) => {
+      console.log("Note saved successfully!");
     });
 
-}
+  }
 
 };
 
 
 const updateNoteCount = () => {
-  Note.find({}).then((notes) => {
+  Note.find({}).then((notes: any) => {
     for (let i = 0; i < notes.length; i++) {
       notes[i].noteCount = i + 1;
-      notes[i].save().then((result) => {
+      notes[i].save().then((result: any) => {
         console.log("Note count updated successfully!", i);
       });
     }
@@ -88,7 +88,7 @@ const main = () => {
         console.log("invalid input");
     }
 
-  
+
   });
 
 }
