@@ -105,18 +105,16 @@ app.post("/notes", async (req, res) => {
 		.catch(() => res.status(400).send("can't added"));
 });
 app.put("/notes/:id", async (req, res) => {
+  console.log("req.body", req.body); // TODO req.body is undefined here
+  console.log("req.params.id", req.params.id);
 	await Note.updateOne({ id: req.params.id }, req.body)
-		.then(() => res.status(201).send("update succeful"))
+		.then(() => res.status(201).send({msg:"update succeful"}))
 		.catch(() => res.status(500).send());
 })
 app.delete("/notes/:id", async (req, res) => {
-	await Note.findByIdAndDelete(req.params.id, (err: any, docs: any) => {
-		if (err) {
-			res.sendStatus(500);
-		} else {
-			res.status(204).send("delete succefuly");
-		}
-	});
+	await Note.findByIdAndDelete(req.params.id)
+    .then(() => res.status(204).send("delete succeful"))
+    .catch(() => res.status(500).send());
 });
 app.listen(port, () => {
 	console.log(`Server running on port ${port}`);

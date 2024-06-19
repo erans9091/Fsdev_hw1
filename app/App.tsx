@@ -15,14 +15,15 @@ const App = () => {
   const [currPage, setCurrPage] = useState(1);
   const [totalPosts, setTotalPosts] = useState(0);
   const [postsPerPage, setPostsPerPage] = useState(10);
+  const [reFetch, setReFetch] = useState(true);
 
   const NOTES_URL = "http://localhost:3001/notes";
 
   useEffect(() => {
     fetch(NOTES_URL + `?_page=${currPage}` + `&_limit=${postsPerPage}`)
       .then((res) => {
-
-        res.headers.get("x-total-count") && setTotalPosts(+res.headers.get("x-total-count")!);
+        res.headers.get("x-total-count") &&
+          setTotalPosts(+res.headers.get("x-total-count")!);
         return res.json();
       })
       .then((data) => {
@@ -35,7 +36,7 @@ const App = () => {
       });
   }, []);
 
-  
+
   const calcPagesRange = () => {
     const maxPage = Math.ceil(totalPosts / postsPerPage);
     if (currPage <= 3) {
@@ -58,12 +59,12 @@ const App = () => {
       .catch((error) => {
         console.log("Encountered an error:" + error);
       });
-  }, [currPage, postsPerPage]);
+  }, [currPage, postsPerPage , reFetch]);
 
   return (
     <div className="app">
       <Header postsPerPage={postsPerPage} setPostsPerPage={setPostsInPage} />
-      <Page posts={posts} pageNumber={currPage} />
+      <Page posts={posts} pageNumber={currPage} baseUrl={NOTES_URL} setReFetch={setReFetch}/>
       <Pagination
         currPage={currPage}
         setCurrPage={setCurrPage}
