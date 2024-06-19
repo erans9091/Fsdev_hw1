@@ -5,7 +5,6 @@ import Page from "./components/Page";
 import Pagination from "./components/Pagination";
 import Header from "./components/Header";
 
-import { pages } from "next/dist/build/templates/app-page";
 
 // import script from "../../scripts/generateNotes"
 

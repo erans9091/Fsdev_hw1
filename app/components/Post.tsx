@@ -1,4 +1,4 @@
-import { useRef, useState, useEffect } from "react";
+import { useRef, useState, useEffect, Dispatch, SetStateAction } from "react";
 import { PostParams } from "../types";
 
 const Post = ({
@@ -8,7 +8,7 @@ const Post = ({
 }: {
   post: PostParams;
   baseUrl: string;
-  setReFetch: (obj:any) => void;
+  setReFetch: Dispatch<SetStateAction<boolean>>;
 }) => {
   const [content, updateContent] = useState(post.content);
   const [isEdit, setIsEdit] = useState(false);

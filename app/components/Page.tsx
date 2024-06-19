@@ -1,5 +1,5 @@
 import Post from "./Post";
-
+import { Dispatch, SetStateAction } from "react";
 import { PostParams } from "../types";
 const Page = ({
   posts,
@@ -10,7 +10,7 @@ const Page = ({
   posts: PostParams[];
   pageNumber: number;
   baseUrl: string;
-  setReFetch: () => void;
+  setReFetch: Dispatch<SetStateAction<boolean>>
 }) => {
   return (
     <div className="page">
