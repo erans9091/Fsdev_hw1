@@ -7,13 +7,15 @@ const Post = ({
   baseUrl,
   setReFetch,
   updatePost,
-  ith
+  ith,
+  deleteAction
 }: {
   post: PostParams;
   baseUrl: string;
   setReFetch: Dispatch<SetStateAction<boolean>>;
   updatePost: (ith: number, post: PostParams, thenf: (res: any) => void) => void;
   ith: number;
+  deleteAction: (ith: number) => void;
 }) => {
   const [content, updateContent] = useState(post.content);
   const [isEdit, setIsEdit] = useState(false);
@@ -28,21 +30,7 @@ const Post = ({
     }
   };
 
-  const deleteAction = async () => {
-    fetch(`${baseUrl}/${post.id}`, { method: "DELETE" })
-      .then((response) => {
-        if (response.ok) {
-          console.log("response", response);
-          setReFetch((prev) => !prev);
-          //TODO re-render the page with new set of notes
-        } else {
-          console.error("Failed to delete post");
-        }
-      })
-      .catch((error) => {
-        console.error("Error deleting post:", error);
-      });
-  };
+
 
   const saveEdit = () => {
     //sent update request
@@ -92,7 +80,7 @@ const Post = ({
         </>
       )}
       <br></br>
-      <button name={"delete-" + post.id} onClick={deleteAction}>
+      <button name={"delete-" + post.id} onClick={() => deleteAction(ith)}>
         delete
       </button>
     </div>

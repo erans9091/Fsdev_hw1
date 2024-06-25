@@ -76,12 +76,32 @@ const App = () => {
     return 0;
   };
   const updatePost = async (ith: number, post: PostParams, thenf: (res: any) => void) => {
-    const curith = postsPerPage * currPage + ith;
+    const curith = postsPerPage * (currPage - 1) + ith;
     axios
-      .post(NOTES_URL + "/" + curith, { post })
+      .put(NOTES_URL + "/" + curith, { post })
       .then(thenf)
       .catch((error) => console.error("Error updating post:", error));
   }
+  const deleteAction = async (ith: number) => {
+    const curith = postsPerPage * (currPage - 1) + ith;
+    axios
+      .delete(NOTES_URL + "/" + curith)
+      .then((res) => {
+        if (res.status == 204) {
+          setTotalPosts(totalPosts - 1);//triger rerender
+          if (totalPosts == curith && totalPosts % postsPerPage == 1) {
+            //means we deleted the last post in the current page
+            setCurrPage(currPage - 1);
+          }
+          console.log("Post deleted succesfully");
+        } else if (res.status == 500) {
+          console.log("Can't deleted post");
+        }
+
+      })
+      .catch((error) => console.error("Error updating post:", error));
+
+  };
   return (
     <div className="app">
       <Header postsPerPage={postsPerPage} setPostsPerPage={setPostsInPage} />
@@ -92,6 +112,7 @@ const App = () => {
         addPost={addPost}
         setReFetch={setReFetch}
         updatePost={updatePost}
+        deleteAction={deleteAction}
       />
       <Pagination
         currPage={currPage}

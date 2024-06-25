@@ -11,6 +11,7 @@ const Page = ({
   addPost,
   setReFetch,
   updatePost,
+  deleteAction
 }: {
   posts: PostParams[];
   pageNumber: number;
@@ -18,6 +19,7 @@ const Page = ({
   addPost: (post: PostParams) => void;
   setReFetch: Dispatch<SetStateAction<boolean>>;
   updatePost: (ith: number, post: PostParams, thenf: (res: any) => void) => void;
+  deleteAction: (ith: number) => void;
 }) => {
 
   const [showAddForm, setShowAddForm] = useState(false);
@@ -31,7 +33,8 @@ const Page = ({
           baseUrl={baseUrl}
           setReFetch={setReFetch}
           updatePost={updatePost}
-          ith={index}
+          ith={index + 1}
+          deleteAction={deleteAction}
         />
       ))}
       {

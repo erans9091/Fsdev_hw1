@@ -27,7 +27,8 @@ const password = process.argv[2];
 const url = process.env.MONGODB_CONNECTION_URL.replace("<password>", password);
 
 const deleteNote = async (id) => {
-  await Note.findByIdAndDelete(id);
+  await Note.findByIdAndDelete(id).then(
+  );
 };
 
 const updateNote = async (id, newNote) => {
@@ -125,12 +126,12 @@ app.put("/notes/:ith", async (req, res) => {
   const ith = parseInt(req.params.ith);
   const newNote = req.body.put;
   const note = await Note.findOne().skip(ith - 1);
-  note ? updateNote(note._id, newNote) : res.status(404).send("note not found");
+  note ? updateNote(note._id, newNote) : res.status(404).send("note not found");// TODO: fix response
 });
 app.delete("/notes/:ith", async (req, res) => {
   const ith = parseInt(req.params.ith);
   const note = await Note.findOne().skip(ith - 1);
-  note ? deleteNote(note._id) : res.status(404).send("note not found");
+  note ? deleteNote(note._id) : res.status(404).send("note not found");// TODO: fix response
 });
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
