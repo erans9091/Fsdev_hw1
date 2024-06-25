@@ -21,18 +21,17 @@ const Page = ({
 }) => {
 
   const [showAddForm, setShowAddForm] = useState(false);
-  let ith = 0;
   return (
     <div className="page">
       <h1>Page {pageNumber}</h1>
-      {posts.map((post) => (
+      {posts.map((post, index) => (
         <Post
           post={post}
           key={post.id}
           baseUrl={baseUrl}
           setReFetch={setReFetch}
           updatePost={updatePost}
-          ith={ith++}
+          ith={index}
         />
       ))}
       {
