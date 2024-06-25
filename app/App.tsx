@@ -1,10 +1,13 @@
 "use client";
-import { useState, useEffect, use } from "react";
+import { useState, useEffect } from "react";
 
 import Page from "./components/Page";
 import Pagination from "./components/Pagination";
 import Header from "./components/Header";
 
+import axios from "axios";
+
+import { PostParams } from "./types";
 
 // import script from "../../scripts/generateNotes"
 
@@ -19,22 +22,20 @@ const App = () => {
   const NOTES_URL = "http://localhost:3001/notes";
 
   useEffect(() => {
-    fetch(NOTES_URL + `?_page=${currPage}` + `&_limit=${postsPerPage}`)
+    axios
+      .get(NOTES_URL + `?_page=${currPage}` + `&_limit=${postsPerPage}`)
       .then((res) => {
-        res.headers.get("x-total-count") &&
-          setTotalPosts(+res.headers.get("x-total-count")!);
-        return res.json();
-      })
-      .then((data) => {
+        // res.headers["x-total-count"] &&     TODO?
+        setTotalPosts(+res.headers["x-total-count"]);
         setPosts(
-          data.sort((a: { id: number }, b: { id: number }) => a.id - b.id)
+          res.data // TODO sort?
         );
+        console.log(res.data);
       })
       .catch((error) => {
         console.log("Encountered an error:" + error);
       });
-  }, []);
-
+  }, [currPage, postsPerPage, reFetch]);
 
   const calcPagesRange = () => {
     const maxPage = Math.ceil(totalPosts / postsPerPage);
@@ -51,19 +52,39 @@ const App = () => {
     setCurrPage(1);
     setPostsPerPage(numberOfPosts);
   };
-  useEffect(() => {
-    fetch(NOTES_URL + `?_page=${currPage}` + `&_limit=${postsPerPage}`)
-      .then((res) => res.json())
-      .then((data) => setPosts(data))
+
+  // id: number,
+  // title: string,
+  // author: Author,
+  // content: string
+  const addPost = (post: PostParams) => {
+    axios
+      .post(NOTES_URL, { post })
+      .then((res) => {
+        const lastPage = Math.ceil(totalPosts / postsPerPage);
+        res.status === 201 &&
+          currPage === lastPage &&
+          posts.length < postsPerPage &&
+          // setReFetch((prev) => !prev); TODO fix
+        console.log("Post added successfully", res.status);
+      })
       .catch((error) => {
-        console.log("Encountered an error:" + error);
+        console.error("Error adding post:", error);
+        return error.status;
       });
-  }, [currPage, postsPerPage , reFetch]);
+    return 0;
+  };
 
   return (
     <div className="app">
       <Header postsPerPage={postsPerPage} setPostsPerPage={setPostsInPage} />
-      <Page posts={posts} pageNumber={currPage} baseUrl={NOTES_URL} setReFetch={setReFetch}/>
+      <Page
+        posts={posts}
+        pageNumber={currPage}
+        baseUrl={NOTES_URL}
+        addPost={addPost}
+        setReFetch={setReFetch}
+      />
       <Pagination
         currPage={currPage}
         setCurrPage={setCurrPage}

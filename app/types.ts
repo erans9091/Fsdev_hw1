@@ -1,27 +1,24 @@
-
-
 export type Page = {
-    name: string
-}
+  name: string;
+};
 
 export type Pagination = {
-    pagesRange: number[]
-}
+  pagesRange: number[];
+};
 
 export type Author = {
-    name: string,
-    email: string
-}
+  name: string;
+  email: string;
+};
 
 export type PostParams = {
-    id: number,
-    title: string,
-    author: Author,
-    content: string
-}
-
+  title: string;
+  author: Author;
+  content: string;
+  id?: number;
+};
 
 export type QueryParams = {
-    currPage: number,
-    postsPerPage: number
-}
+  currPage: number;
+  postsPerPage: number;
+};
