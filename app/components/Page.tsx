@@ -10,15 +10,18 @@ const Page = ({
   baseUrl,
   addPost,
   setReFetch,
+  updatePost,
 }: {
   posts: PostParams[];
   pageNumber: number;
   baseUrl: string;
   addPost: (post: PostParams) => void;
   setReFetch: Dispatch<SetStateAction<boolean>>;
+  updatePost: (ith: number, post: PostParams, thenf: (res: any) => void) => void;
 }) => {
 
   const [showAddForm, setShowAddForm] = useState(false);
+  let ith = 0;
   return (
     <div className="page">
       <h1>Page {pageNumber}</h1>
@@ -28,6 +31,8 @@ const Page = ({
           key={post.id}
           baseUrl={baseUrl}
           setReFetch={setReFetch}
+          updatePost={updatePost}
+          ith={ith++}
         />
       ))}
       {

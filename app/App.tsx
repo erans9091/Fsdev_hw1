@@ -64,8 +64,9 @@ const App = () => {
         const lastPage = Math.ceil(totalPosts / postsPerPage);
         res.status === 201 &&
           currPage === lastPage &&
-          posts.length < postsPerPage &&
+          //posts.length < postsPerPage &&
           // setReFetch((prev) => !prev); TODO fix
+          setTotalPosts(totalPosts + 1);
         console.log("Post added successfully", res.status);
       })
       .catch((error) => {
@@ -74,7 +75,13 @@ const App = () => {
       });
     return 0;
   };
-
+  const updatePost = async (ith: number, post: PostParams, thenf: (res: any) => void) => {
+    const curith = postsPerPage * currPage + ith;
+    axios
+      .post(NOTES_URL + "/" + curith, { post })
+      .then(thenf)
+      .catch((error) => console.error("Error updating post:", error));
+  }
   return (
     <div className="app">
       <Header postsPerPage={postsPerPage} setPostsPerPage={setPostsInPage} />
@@ -84,6 +91,7 @@ const App = () => {
         baseUrl={NOTES_URL}
         addPost={addPost}
         setReFetch={setReFetch}
+        updatePost={updatePost}
       />
       <Pagination
         currPage={currPage}

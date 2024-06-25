@@ -1,41 +1,24 @@
 import { useRef, useState, Dispatch, SetStateAction } from "react";
 import { PostParams } from "../types";
+import { AxiosResponse } from "axios";
 
 const Post = ({
   post,
   baseUrl,
   setReFetch,
+  updatePost,
+  ith
 }: {
   post: PostParams;
   baseUrl: string;
   setReFetch: Dispatch<SetStateAction<boolean>>;
+  updatePost: (ith: number, post: PostParams, thenf: (res: any) => void) => void;
+  ith: number;
 }) => {
   const [content, updateContent] = useState(post.content);
   const [isEdit, setIsEdit] = useState(false);
   const contRef = useRef<HTMLInputElement>(null);
 
-  const updatePost = async () => {
-    try {
-      const response = await fetch(`${baseUrl}/${post.id}`, {
-        //fix id parameter
-        method: "PUT", // or 'PATCH' depending on your API
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ content: contRef.current?.value }),
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to update post");
-      }
-      const updatedPost = await response.json();
-      post.content = content;
-      setIsEdit(false);
-      console.log("Post updated successfully", updatedPost);
-    } catch (error) {
-      console.error("Error updating post:", error);
-    }
-  };
 
   // Update state when contentEditable changes
   const contentChange = () => {
@@ -50,7 +33,7 @@ const Post = ({
       .then((response) => {
         if (response.ok) {
           console.log("response", response);
-		setReFetch((prev) => !prev);
+          setReFetch((prev) => !prev);
           //TODO re-render the page with new set of notes
         } else {
           console.error("Failed to delete post");
@@ -63,7 +46,16 @@ const Post = ({
 
   const saveEdit = () => {
     //sent update request
-    updatePost();
+    updatePost(ith, { ...post, content: content }, async (res: AxiosResponse<any, any>) => {
+      if (res.status == 201) {
+        const updatedPost = await res.data;
+        post.content = content;
+        setIsEdit(false);
+        console.log("Post updated successfully", updatedPost);
+      } else if (res.status == 500) {
+        console.log("Post failed to update");
+      }
+    });
   };
 
   return (
