@@ -9,6 +9,7 @@ const dotenv = require("dotenv");
 const cors = require("cors");
 
 const bodyParser = require("body-parser");
+const logger = require("./logger").initLogger();
 
 dotenv.config();
 const port = process.env.PORT;
@@ -87,7 +88,7 @@ noteSchema.set("toJSON", {
 });
 
 app.get("/notes", async (req, res) => {
-  console.log("recieved a request from: ", req.url);
+  logger.log("GET", "/notes");
   const { _page, _limit } = req.query;
   const page = parseInt(_page) || 1;
   const limit = parseInt(_limit) || 10;
@@ -105,6 +106,7 @@ app.get("/notes", async (req, res) => {
 });
 
 app.get("/notes/:ith", async (req, res) => {
+  logger.log("GET", `/notes/${req.params.ith}`);
   const ith = parseInt(req.params.ith);
   const note = await Note.findOne().skip(ith - 1);
   res.json(note);

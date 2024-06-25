@@ -1,4 +1,4 @@
-import { useRef, useState, useEffect, Dispatch, SetStateAction } from "react";
+import { useRef, useState, Dispatch, SetStateAction } from "react";
 import { PostParams } from "../types";
 
 const Post = ({
