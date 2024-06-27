@@ -58,16 +58,18 @@ const App = () => {
   // author: Author,
   // content: string
   const addPost = (post: PostParams) => {
+    const lastPage = Math.ceil(totalPosts / postsPerPage);
+    const updatePagination =
+      currPage === lastPage ||
+      (totalPosts % postsPerPage === 0 &&
+        (currPage === lastPage - 1 || currPage === lastPage - 2));
     axios
       .post(NOTES_URL, { post })
       .then((res) => {
-        const lastPage = Math.ceil(totalPosts / postsPerPage);
         res.status === 201 &&
-          currPage === lastPage &&
-          //posts.length < postsPerPage &&
-          // setReFetch((prev) => !prev); TODO fix
+          updatePagination &&
           setTotalPosts(totalPosts + 1);
-        console.log("Post added successfully", res.status);
+          console.log("Post added successfully", res.status);
       })
       .catch((error) => {
         console.error("Error adding post:", error);
@@ -75,21 +77,28 @@ const App = () => {
       });
     return 0;
   };
-  const updatePost = async (ith: number, post: PostParams, thenf: (res: any) => void) => {
+  const updatePost = async (
+    ith: number,
+    post: PostParams,
+    thenf: (res: any) => void
+  ) => {
     const curith = postsPerPage * (currPage - 1) + ith;
     axios
       .put(NOTES_URL + "/" + curith, { post })
       .then(thenf)
       .catch((error) => console.error("Error updating post:", error));
-  }
+  };
   const deleteAction = async (ith: number) => {
     const curith = postsPerPage * (currPage - 1) + ith;
-    axios
+    console.log("Deleting post number: ", curith);
+    const res = await axios
       .delete(NOTES_URL + "/" + curith)
       .then((res) => {
+        console.log(res);
         if (res.status == 204) {
-          setTotalPosts(totalPosts - 1);//triger rerender
-          if (totalPosts == curith && totalPosts % postsPerPage == 1) {
+          console.log(res.status);
+          setTotalPosts((curr) => curr - 1);
+          if (totalPosts === curith && totalPosts % postsPerPage === 1) {
             //means we deleted the last post in the current page
             setCurrPage(currPage - 1);
           }
@@ -97,10 +106,13 @@ const App = () => {
         } else if (res.status == 500) {
           console.log("Can't deleted post");
         }
-
       })
-      .catch((error) => console.error("Error updating post:", error));
+      .catch((error) => {
+        console.log("Error deleting post:")
+        console.error("Error updating post:", error)});
 
+
+      console.log("finished deleteAction")
   };
   return (
     <div className="app">

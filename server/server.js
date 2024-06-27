@@ -27,14 +27,11 @@ const password = process.argv[2];
 const url = process.env.MONGODB_CONNECTION_URL.replace("<password>", password);
 
 const deleteNote = async (id) => {
-  await Note.findByIdAndDelete(id).then(
-  );
+  await Note.findByIdAndDelete(id);
 };
 
 const updateNote = async (id, newNote) => {
-  await Note.findByIdAndUpdate(id, newNote)
-    .then((obj) => res.status(201).send(obj._id))
-    .catch(() => res.status(500).send());
+  await Note.findByIdAndUpdate(id, newNote);
 };
 
 mongoose.set("strictQuery", false);
@@ -126,12 +123,17 @@ app.put("/notes/:ith", async (req, res) => {
   const ith = parseInt(req.params.ith);
   const newNote = req.body.put;
   const note = await Note.findOne().skip(ith - 1);
-  note ? updateNote(note._id, newNote) : res.status(404).send("note not found");// TODO: fix response
+  note
+    ? updateNote(note._id, newNote).then(res.status(201).send("note updated"))
+    : res.status(404).send("note not found"); // TODO: fix response
 });
 app.delete("/notes/:ith", async (req, res) => {
+  logger.log("DELETE", `/notes/${req.params.ith}`);
   const ith = parseInt(req.params.ith);
   const note = await Note.findOne().skip(ith - 1);
-  note ? deleteNote(note._id) : res.status(404).send("note not found");// TODO: fix response
+  note
+    ? deleteNote(note._id).then(res.status(204).send("note deleted"))
+    : res.status(404).send("note not found"); // TODO: fix response
 });
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);

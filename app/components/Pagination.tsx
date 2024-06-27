@@ -34,36 +34,40 @@ const Pagination = ({
 
   return (
     <div className="pagination">
-      {!pagesRange.includes(1) && (
-        <button onClick={() => handleEdge("first")} name="first">
-          first
-        </button>
-      )}
-      {pagesRange[0] !== 1 && (
-        <button onClick={() => handleArrowClick("left")} name="previous">
-          &laquo;
-        </button>
-      )}
+      <button
+        onClick={() => currPage !== 1 && handleEdge("first")}
+        name="first"
+      >
+        First
+      </button>
+      <button
+        onClick={() => currPage !== 1 && handleArrowClick("left")}
+        name="previous"
+      >
+        Prev
+      </button>
       {pagesRange.map((i) => (
         <button
-          key={i}
+          key={"page-"+i}
           onClick={() => handlePageChange(i)}
           className={i === currPage ? "current" : ""}
-          name={"page-" + currPage}
+          name={"page-" + i}
         >
           {i}
         </button>
       ))}
-      {!pagesRange.includes(maxPage) && (
-        <>
-          <button onClick={() => handleArrowClick()} name="next">
-            &raquo;
-          </button>
-          <button onClick={() => handleEdge("last")} name="last">
-            last
-          </button>
-        </>
-      )}
+      <button
+        onClick={() => currPage !== maxPage && handleArrowClick()}
+        name="next"
+      >
+        Next
+      </button>
+      <button
+        onClick={() => currPage !== maxPage && handleEdge("last")}
+        name="last"
+      >
+        Last
+      </button>
     </div>
   );
 };
