@@ -5,7 +5,7 @@ const dotenv = require("dotenv");
 dotenv.config();
 const password = process.argv[2];
 //@ts-ignore
-const url = process.env.URL.replace("<password>", password);
+const url = process.env.MONGODB_CONNECTION_URL.replace("<password>", password);
 
 mongoose.set("strictQuery", false);
 
@@ -26,7 +26,7 @@ const noteSchema = new mongoose.Schema({
       email: String,
     } || null,
   content: String,
-  noteCount: Number,
+  id: Number,
 });
 
 const Note = mongoose.model("Note", noteSchema);
@@ -57,9 +57,12 @@ const fillDBFromJSON = () => {
 const updateNoteCount = () => {
   Note.find({}).then((notes: any) => {
     for (let i = 0; i < notes.length; i++) {
-      notes[i].noteCount = i + 1;
+      console.log("update note", i);
+      notes[i].id = i
+      console.log(notes[i]);
       notes[i].save().then((result: any) => {
         console.log("Note count updated successfully!", i);
+        console.log(result);
       });
     }
   }

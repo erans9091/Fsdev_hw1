@@ -1,8 +1,3 @@
-// import express from "express";
-// import mongoose from "mongoose";
-// import dotenv from "dotenv";
-// import cors from "cors";
-
 const express = require("express");
 const mongoose = require("mongoose");
 const dotenv = require("dotenv");
@@ -57,36 +52,16 @@ const noteSchema = new mongoose.Schema({
 
 const Note = mongoose.model("Note", noteSchema);
 
-// Note.countDocuments({}).then((result) => {
-// console.log("totalNotes", result);
-// });
-
-// const note = new Note({
-//   id: 1,
-//   title: "Note 1",
-//   author: {
-//     name: "Author 1",
-//     email: "author1@gmail.com",
-//   },
-//   content: "This is the first note",
-// });
-
-// note.save().then((result:Result) => {
-//     console.log("result", result);
-//   console.log("note saved!");
-//   mongoose.connection.close();
-// });
-
 noteSchema.set("toJSON", {
   transform: (document, returnedObject) => {
-    returnedObject.id = returnedObject._id.toString();
+    // returnedObject.id = returnedObject._id.toString();
     delete returnedObject._id;
     delete returnedObject.__v;
   },
 });
 
 app.get("/notes", async (req, res) => {
-  logger.log("GET", "/notes");
+  logger.log("GET", req.url);
   const { _page, _limit } = req.query;
   const page = parseInt(_page) || 1;
   const limit = parseInt(_limit) || 10;
@@ -104,31 +79,37 @@ app.get("/notes", async (req, res) => {
 });
 
 app.get("/notes/:ith", async (req, res) => {
-  logger.log("GET", `/notes/${req.params.ith}`);
+  logger.log("GET", req.url);
   const ith = parseInt(req.params.ith);
   const note = await Note.findOne().skip(ith - 1);
   res.json(note);
 });
-app.get("/", (req, res) => {
+app.get("/", async (req, res) => {
   res.status(200).send("server is running!");
 });
 app.post("/notes", async (req, res) => {
   const newNote = req.body.post;
 
-  await Note.create(newNote)
+  const last = await Note.findOne().sort({ _id: -1 });
+  const lastId = last.id || 0;
+
+  await Note.create({ ...newNote, id: lastId + 1 })
     .then((obj) => res.status(201).send(obj._id))
     .catch(() => res.status(400).send("can't add"));
 });
 app.put("/notes/:ith", async (req, res) => {
   const ith = parseInt(req.params.ith);
   const newNote = req.body.put;
+
+  logger.log("PUT", req.url, newNote);
+
   const note = await Note.findOne().skip(ith - 1);
   note
     ? updateNote(note._id, newNote).then(res.status(201).send("note updated"))
     : res.status(404).send("note not found"); // TODO: fix response
 });
 app.delete("/notes/:ith", async (req, res) => {
-  logger.log("DELETE", `/notes/${req.params.ith}`);
+  logger.log("DELETE", req.url);
   const ith = parseInt(req.params.ith);
   const note = await Note.findOne().skip(ith - 1);
   note

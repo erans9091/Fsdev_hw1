@@ -3,7 +3,6 @@ import { Dispatch, SetStateAction, useState } from "react";
 import { PostParams } from "../types";
 import AddPostForm from "./AddPostForm";
 
-
 const Page = ({
   posts,
   pageNumber,
@@ -11,21 +10,25 @@ const Page = ({
   addPost,
   setReFetch,
   updatePost,
-  deleteAction
+  deleteAction,
 }: {
   posts: PostParams[];
   pageNumber: number;
   baseUrl: string;
   addPost: (post: PostParams) => void;
   setReFetch: Dispatch<SetStateAction<boolean>>;
-  updatePost: (ith: number, post: PostParams, thenf: (res: any) => void) => void;
+  updatePost: (
+    ith: number,
+    post: PostParams,
+    thenf: (res: any) => void
+  ) => void;
   deleteAction: (ith: number) => void;
 }) => {
-
   const [showAddForm, setShowAddForm] = useState(false);
   return (
     <div className="page">
       <h1>Page {pageNumber}</h1>
+      <button>theme</button>
       {posts.map((post, index) => (
         <Post
           post={post}
@@ -37,19 +40,16 @@ const Page = ({
           deleteAction={deleteAction}
         />
       ))}
-      {
-        showAddForm ? (
-          <AddPostForm addPost={addPost}
-            cancle_func={() => setShowAddForm(false)} />
-        ) : (
-          <button
-            onClick={() => setShowAddForm(true)}
-            name="add_new_note"
-          >
-            Add a new note
-          </button>
-        )
-      }
+      {showAddForm ? (
+        <AddPostForm
+          addPost={addPost}
+          cancel_func={() => setShowAddForm(false)}
+        />
+      ) : (
+        <button onClick={() => setShowAddForm(true)} name="add_new_note">
+          Add a new note
+        </button>
+      )}
     </div>
   );
 };
