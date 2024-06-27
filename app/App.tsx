@@ -19,6 +19,7 @@ const App = () => {
   const [postsPerPage, setPostsPerPage] = useState(10);
   const [reFetch, setReFetch] = useState(true);
 
+  console.log("totalPosts", totalPosts);
   const NOTES_URL = "http://localhost:3001/notes";
 
   useEffect(() => {
@@ -35,7 +36,7 @@ const App = () => {
       .catch((error) => {
         console.log("Encountered an error:" + error);
       });
-  }, [currPage, postsPerPage, reFetch]);
+  }, [currPage, postsPerPage, totalPosts]);
 
   const calcPagesRange = () => {
     const maxPage = Math.ceil(totalPosts / postsPerPage);
@@ -66,10 +67,8 @@ const App = () => {
     axios
       .post(NOTES_URL, { post })
       .then((res) => {
-        res.status === 201 &&
-          updatePagination &&
-          setTotalPosts(totalPosts + 1);
-          console.log("Post added successfully", res.status);
+        res.status === 201 && updatePagination && setTotalPosts(totalPosts + 1);
+        console.log("Post added successfully", res.status);
       })
       .catch((error) => {
         console.error("Error adding post:", error);
@@ -91,14 +90,14 @@ const App = () => {
   const deleteAction = async (ith: number) => {
     const curith = postsPerPage * (currPage - 1) + ith;
     console.log("Deleting post number: ", curith);
-    const res = await axios
+    axios
       .delete(NOTES_URL + "/" + curith)
       .then((res) => {
         console.log(res);
         if (res.status == 204) {
-          console.log(res.status);
           setTotalPosts((curr) => curr - 1);
           if (totalPosts === curith && totalPosts % postsPerPage === 1) {
+            console.log("should rerender");
             //means we deleted the last post in the current page
             setCurrPage(currPage - 1);
           }
@@ -108,11 +107,11 @@ const App = () => {
         }
       })
       .catch((error) => {
-        console.log("Error deleting post:")
-        console.error("Error updating post:", error)});
+        console.log("Error deleting post:");
+        console.error("Error updating post:", error);
+      });
 
-
-      console.log("finished deleteAction")
+    console.log("finished deleteAction");
   };
   return (
     <div className="app">
