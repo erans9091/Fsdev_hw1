@@ -39,10 +39,12 @@ const Page = ({
       ))}
       {
         showAddForm ? (
-          <AddPostForm addPost={addPost} />
+          <AddPostForm addPost={addPost}
+            cancle_func={() => setShowAddForm(false)} />
         ) : (
           <button
             onClick={() => setShowAddForm(true)}
+            name="add_new_note"
           >
             Add a new note
           </button>

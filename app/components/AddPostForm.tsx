@@ -2,7 +2,8 @@ import { useState, FormEvent } from "react";
 
 import { PostParams } from "../types";
 
-const AddPostForm = ({ addPost }: { addPost: (post: PostParams) => void }) => {
+const AddPostForm = ({ addPost, cancle_func }:
+  { addPost: (post: PostParams) => void; cancle_func: any }) => {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [authorName, setAuthorName] = useState("");
@@ -36,8 +37,7 @@ const AddPostForm = ({ addPost }: { addPost: (post: PostParams) => void }) => {
 
   return (
     <div
-      className="add-post-form
-        "
+      className="add-post-form"
     >
       <h2>Add a new note</h2>
       <form onSubmit={handleSubmit}>
@@ -47,6 +47,7 @@ const AddPostForm = ({ addPost }: { addPost: (post: PostParams) => void }) => {
             type="text"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
+            name="text_input_new_note"
           ></input>
         </label>
         <label>
@@ -55,6 +56,7 @@ const AddPostForm = ({ addPost }: { addPost: (post: PostParams) => void }) => {
             type="text"
             value={content}
             onChange={(e) => setContent(e.target.value)}
+            name="text_input_new_note"
           ></input>
         </label>
         <label>
@@ -63,6 +65,7 @@ const AddPostForm = ({ addPost }: { addPost: (post: PostParams) => void }) => {
             type="text"
             value={authorName}
             onChange={(e) => setAuthorName(e.target.value)}
+            name="text_input_new_note"
           ></input>
         </label>
         <label>
@@ -71,9 +74,12 @@ const AddPostForm = ({ addPost }: { addPost: (post: PostParams) => void }) => {
             type="text"
             value={authorEmail}
             onChange={(e) => setAuthorEmail(e.target.value)}
-          ></input>
+            name="text_input_new_note"
+          >
+          </input>
         </label>
-        <button type="submit">Add</button>
+        <button type="submit" name="text_input_save_new_note">save</button>
+        <button onChange={cancle_func} name="text_input_cancel_new_note">cancle</button>
       </form>
     </div>
   );
