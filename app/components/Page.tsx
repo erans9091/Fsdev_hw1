@@ -28,7 +28,6 @@ const Page = ({
   return (
     <div className="page">
       <h1>Page {pageNumber}</h1>
-      <button>theme</button>
       {posts.map((post, index) => (
         <Post
           post={post}

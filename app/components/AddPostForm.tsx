@@ -83,8 +83,8 @@ const AddPostForm = ({
         <button type="submit" name="text_input_save_new_note">
           save
         </button>
-        <button onChange={cancel_func} name="text_input_cancel_new_note">
-          cancle
+        <button onClick={cancel_func} name="text_input_cancel_new_note">
+          cancel
         </button>
       </form>
     </div>

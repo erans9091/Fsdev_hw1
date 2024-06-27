@@ -18,6 +18,7 @@ const App = () => {
   const [totalPosts, setTotalPosts] = useState(0);
   const [postsPerPage, setPostsPerPage] = useState(10);
   const [reFetch, setReFetch] = useState(true);
+  const [theme, setTheme] = useState("light");
 
   console.log("totalPosts", totalPosts);
   const NOTES_URL = "http://localhost:3001/notes";
@@ -114,7 +115,10 @@ const App = () => {
     console.log("finished deleteAction");
   };
   return (
-    <div className="app">
+    <div className={`app ${theme}`}>
+      <button onClick={() => setTheme(theme === "light" ? "dark" : "light")}>
+        theme
+      </button>
       <Header postsPerPage={postsPerPage} setPostsPerPage={setPostsInPage} />
       <Page
         posts={posts}
