@@ -20,7 +20,6 @@ const App = () => {
   const [reFetch, setReFetch] = useState(true);
   const [theme, setTheme] = useState("light");
 
-  console.log("totalPosts", totalPosts);
   const NOTES_URL = "http://localhost:3001/notes";
 
   useEffect(() => {
@@ -32,7 +31,6 @@ const App = () => {
         setPosts(
           res.data // TODO sort?
         );
-        console.log(res.data);
       })
       .catch((error) => {
         console.log("Encountered an error:" + error);
@@ -94,11 +92,9 @@ const App = () => {
     axios
       .delete(NOTES_URL + "/" + curith)
       .then((res) => {
-        console.log(res);
         if (res.status == 204) {
           setTotalPosts((curr) => curr - 1);
           if (totalPosts === curith && totalPosts % postsPerPage === 1) {
-            console.log("should rerender");
             //means we deleted the last post in the current page
             setCurrPage(currPage - 1);
           }
@@ -111,8 +107,6 @@ const App = () => {
         console.log("Error deleting post:");
         console.error("Error updating post:", error);
       });
-
-    console.log("finished deleteAction");
   };
   return (
     <div className={`app ${theme}`}>

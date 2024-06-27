@@ -48,6 +48,7 @@ const noteSchema = new mongoose.Schema({
       email: String,
     } || null,
   content: String,
+  id: Number,
 });
 
 const Note = mongoose.model("Note", noteSchema);
@@ -90,7 +91,9 @@ app.get("/", async (req, res) => {
 app.post("/notes", async (req, res) => {
   const newNote = req.body.post;
 
-  const last = await Note.findOne().sort({ _id: -1 });
+  const count = await Note.collection.countDocuments();
+
+  const last = await Note.findOne().skip(count - 1);
   const lastId = last.id || 0;
 
   await Note.create({ ...newNote, id: lastId + 1 })
