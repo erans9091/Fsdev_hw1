@@ -7,7 +7,6 @@ const bodyParser = require("body-parser");
 const logger = require("./logger").initLogger();
 
 dotenv.config();
-const port = process.env.PORT;
 
 const app = express();
 const corsOptions = {
@@ -18,8 +17,17 @@ const corsOptions = {
 app.use(bodyParser.json());
 app.use(cors(corsOptions));
 
-const password = process.argv[2];
-const url = process.env.MONGODB_CONNECTION_URL.replace("<password>", password);
+const port = process.env.PORT || 3001;
+
+let password;
+let url;
+if (process.argv.length > 2) {
+  password = process.argv[2];
+  url = process.env.MONGODB_CONNECTION_URL.replace("<password>", password);
+} else {
+  url = process.env.MONGODB_CONNECTION_URL;
+}
+// const url = process.env.MONGODB_CONNECTION_URL.replace("<password>", password);
 
 const deleteNote = async (id) => {
   await Note.findByIdAndDelete(id);
