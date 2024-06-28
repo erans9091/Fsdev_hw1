@@ -50,7 +50,7 @@ const AddPostForm = ({
             type="text"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            name="text_input_new_note"
+            name="text_input_title_new_note"
           ></input>
         </label>
         <label>
@@ -68,7 +68,7 @@ const AddPostForm = ({
             type="text"
             value={authorName}
             onChange={(e) => setAuthorName(e.target.value)}
-            name="text_input_new_note"
+            name="text_input_author_new_note"
           ></input>
         </label>
         <label>
@@ -77,7 +77,7 @@ const AddPostForm = ({
             type="text"
             value={authorEmail}
             onChange={(e) => setAuthorEmail(e.target.value)}
-            name="text_input_new_note"
+            name="text_input_email_new_note"
           ></input>
         </label>
         <button type="submit" name="text_input_save_new_note">

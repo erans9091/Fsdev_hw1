@@ -6,17 +6,13 @@ import AddPostForm from "./AddPostForm";
 const Page = ({
   posts,
   pageNumber,
-  baseUrl,
   addPost,
-  setReFetch,
   updatePost,
   deleteAction,
 }: {
   posts: PostParams[];
   pageNumber: number;
-  baseUrl: string;
   addPost: (post: PostParams) => void;
-  setReFetch: Dispatch<SetStateAction<boolean>>;
   updatePost: (
     ith: number,
     post: PostParams,
@@ -32,8 +28,6 @@ const Page = ({
         <Post
           post={post}
           key={post.id}
-          baseUrl={baseUrl}
-          setReFetch={setReFetch}
           updatePost={updatePost}
           ith={index + 1}
           deleteAction={deleteAction}

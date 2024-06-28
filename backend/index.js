@@ -78,6 +78,11 @@ app.get("/notes", async (req, res) => {
 
   const notes = await Note.find({}).skip(skip).limit(limit);
 
+  if (!notes || notes.length === 0) {
+    res.status(404).send("no notes found");
+    return;
+  }
+
   // Get total note count
   const totalNotes = await Note.countDocuments({});
 
@@ -91,7 +96,7 @@ app.get("/notes/:ith", async (req, res) => {
   logger.log("GET", req.url);
   const ith = parseInt(req.params.ith);
   const note = await Note.findOne().skip(ith - 1);
-  res.json(note);
+  note ? res.status(200).json(note) : res.status(404).send("note not found");
 });
 app.get("/", async (req, res) => {
   res.status(200).send("server is running!");
@@ -116,8 +121,10 @@ app.put("/notes/:ith", async (req, res) => {
 
   const note = await Note.findOne().skip(ith - 1);
   note
-    ? updateNote(note._id, newNote).then(res.status(201).send("note updated"))
-    : res.status(404).send("note not found"); // TODO: fix response
+    ? updateNote(note._id, newNote)
+        .then(res.status(201).send("note updated"))
+        .catch(() => res.status(400).send("can't update"))
+    : res.status(404).send("note not found");
 });
 app.delete("/notes/:ith", async (req, res) => {
   logger.log("DELETE", req.url);
@@ -125,7 +132,7 @@ app.delete("/notes/:ith", async (req, res) => {
   const note = await Note.findOne().skip(ith - 1);
   note
     ? deleteNote(note._id).then(res.status(204).send("note deleted"))
-    : res.status(404).send("note not found"); // TODO: fix response
+    : res.status(404).send("note not found");
 });
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);

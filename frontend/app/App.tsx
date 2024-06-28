@@ -17,7 +17,6 @@ const App = () => {
   const [currPage, setCurrPage] = useState(1);
   const [totalPosts, setTotalPosts] = useState(0);
   const [postsPerPage, setPostsPerPage] = useState(10);
-  const [reFetch, setReFetch] = useState(true);
   const [theme, setTheme] = useState("light");
 
   const NOTES_URL = "http://localhost:3001/notes";
@@ -110,16 +109,14 @@ const App = () => {
   };
   return (
     <div className={`app ${theme}`}>
-      <button onClick={() => setTheme(theme === "light" ? "dark" : "light")}>
+      <button onClick={() => setTheme(theme === "light" ? "dark" : "light")} name='change_theme'>
         theme
       </button>
       <Header postsPerPage={postsPerPage} setPostsPerPage={setPostsInPage} />
       <Page
         posts={posts}
         pageNumber={currPage}
-        baseUrl={NOTES_URL}
         addPost={addPost}
-        setReFetch={setReFetch}
         updatePost={updatePost}
         deleteAction={deleteAction}
       />

@@ -4,15 +4,11 @@ import { AxiosResponse } from "axios";
 
 const Post = ({
   post,
-  baseUrl,
-  setReFetch,
   updatePost,
   ith,
   deleteAction
 }: {
   post: PostParams;
-  baseUrl: string;
-  setReFetch: Dispatch<SetStateAction<boolean>>;
   updatePost: (ith: number, post: PostParams, thenf: (res: any) => void) => void;
   ith: number;
   deleteAction: (ith: number) => void;
