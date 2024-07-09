@@ -2,6 +2,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 const dotenv = require("dotenv");
 const cors = require("cors");
+const bcrypt = require('bcrypt');
 
 const bodyParser = require("body-parser");
 const logger = require("./logger").initLogger();
@@ -39,10 +40,10 @@ const noteSchema = new mongoose.Schema({
   id: Number,
 });
 export const userSchema = new mongoose.Schema({
-  name: string,
-  email: string,
-  username: string,
-  passwordHash: string
+  name: String,
+  email: String,
+  username: String,
+  passwordHash: String
 });
 
 const Note = mongoose.model("Note", noteSchema);
@@ -78,6 +79,7 @@ userSchema.set("toJSON", {
   transform: (document, returnedObject) => {
     delete returnedObject._id;
     delete returnedObject.__v;
+    delete returnedObject.passwordHash
   },
 });
 
@@ -152,7 +154,24 @@ app.listen(port, () => {
 
 app.post("/user", async (req, res) => {
   const userData = req.body.post;
-  await Note.create({ ...userData })
+  const saltRounds = 10
+  const ph = await bcrypt.hash(userData["password"], saltRounds)
+  await User.create({
+    name: userData["name"],
+    email: userData["email"],
+    username: userData["username"],
+    passwordHash: ph
+  })
     .then((obj) => res.status(201).send(obj._id))
-    .catch(() => res.status(400).send("can't add"));
+    .catch(() => res.status(400).send("can't add user"));
+})
+
+app.post("/login", async (req, res) => {
+  const { un, pw } = req.body.post;
+  const saltRounds = 10;
+  const ph = await bcrypt.hash(pw, saltRounds);
+  const user = await User.findOne({ username: un, passwordHash: ph });
+  user ? res.status(201).send({ token: "token", name: user["name"], email: user["email"] }:
+    res.status(500).send(`can't login to user: ${un}`)
+  )//Todo: return uniqe token
 })
