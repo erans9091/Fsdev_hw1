@@ -149,3 +149,10 @@ app.delete("/notes/:ith", async (req, res) => {
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
 });
+
+app.post("/user", async (req, res) => {
+  const userData = req.body.post;
+  await Note.create({ ...userData })
+    .then((obj) => res.status(201).send(obj._id))
+    .catch(() => res.status(400).send("can't add"));
+})
