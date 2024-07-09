@@ -28,6 +28,25 @@ if (process.argv.length > 2) {
   url = process.env.MONGODB_CONNECTION_URL;
 }
 // const url = process.env.MONGODB_CONNECTION_URL.replace("<password>", password);
+const noteSchema = new mongoose.Schema({
+  title: String,
+  author:
+    {
+      name: String,
+      email: String,
+    } || null,
+  content: String,
+  id: Number,
+});
+export const userSchema = new mongoose.Schema({
+  name: string,
+  email: string,
+  username: string,
+  passwordHash: string
+});
+
+const Note = mongoose.model("Note", noteSchema);
+export const User = mongoose.model("User", userSchema);
 
 const deleteNote = async (id) => {
   await Note.findByIdAndDelete(id);
@@ -48,25 +67,6 @@ mongoose
     console.log("failed to connect to MongoDB!\n", error);
   });
 
-const noteSchema = new mongoose.Schema({
-  title: String,
-  author:
-    {
-      name: String,
-      email: String,
-    } || null,
-  content: String,
-  id: Number,
-});
-const userSchema = new mongoose.Schema({
-  name: string,
-  email: string,
-  username: string,
-  passwordHash: string
-});
-
-const Note = mongoose.model("Note", noteSchema);
-const User = mongoose.model("User", userSchema);
 noteSchema.set("toJSON", {
   transform: (document, returnedObject) => {
     // returnedObject.id = returnedObject._id.toString();
