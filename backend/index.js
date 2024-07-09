@@ -58,12 +58,24 @@ const noteSchema = new mongoose.Schema({
   content: String,
   id: Number,
 });
+const userSchema = new mongoose.Schema({
+  name: string,
+  email: string,
+  username: string,
+  passwordHash: string
+});
 
 const Note = mongoose.model("Note", noteSchema);
-
+const User = mongoose.model("User", userSchema);
 noteSchema.set("toJSON", {
   transform: (document, returnedObject) => {
     // returnedObject.id = returnedObject._id.toString();
+    delete returnedObject._id;
+    delete returnedObject.__v;
+  },
+});
+userSchema.set("toJSON", {
+  transform: (document, returnedObject) => {
     delete returnedObject._id;
     delete returnedObject.__v;
   },
@@ -122,8 +134,8 @@ app.put("/notes/:ith", async (req, res) => {
   const note = await Note.findOne().skip(ith - 1);
   note
     ? updateNote(note._id, newNote)
-        .then(res.status(201).send("note updated"))
-        .catch(() => res.status(400).send("can't update"))
+      .then(res.status(201).send("note updated"))
+      .catch(() => res.status(400).send("can't update"))
     : res.status(404).send("note not found");
 });
 app.delete("/notes/:ith", async (req, res) => {
