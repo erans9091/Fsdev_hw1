@@ -39,7 +39,7 @@ const noteSchema = new mongoose.Schema({
   content: String,
   id: Number,
 });
-export const userSchema = new mongoose.Schema({
+const userSchema = new mongoose.Schema({
   name: String,
   email: String,
   username: String,
@@ -47,7 +47,7 @@ export const userSchema = new mongoose.Schema({
 });
 
 const Note = mongoose.model("Note", noteSchema);
-export const User = mongoose.model("User", userSchema);
+const User = mongoose.model("User", userSchema);
 
 const deleteNote = async (id) => {
   await Note.findByIdAndDelete(id);
@@ -171,7 +171,7 @@ app.post("/login", async (req, res) => {
   const saltRounds = 10;
   const ph = await bcrypt.hash(pw, saltRounds);
   const user = await User.findOne({ username: un, passwordHash: ph });
-  user ? res.status(201).send({ token: "token", name: user["name"], email: user["email"] }:
+  user ? res.status(201).send({ token: "token", name: user["name"], email: user["email"] } ) : (
     res.status(500).send(`can't login to user: ${un}`)
   )//Todo: return uniqe token
 })

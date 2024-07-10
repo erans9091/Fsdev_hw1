@@ -1,19 +1,21 @@
 "use client";
+// Libraries
 import { useState, useEffect } from "react";
-
+import axios from "axios";
+// Components
 import Page from "./components/Page";
 import Pagination from "./components/Pagination";
 import Header from "./components/Header";
-
-import axios from "axios";
-
+// Types
 import { PostParams } from "./types";
+// Utils
+import { getPage } from "./utils/cache";
 
 // import script from "../../scripts/generateNotes"
 
 const App = () => {
   //   console.log(script())
-  const [posts, setPosts] = useState([]);
+  const [posts, setPosts] = useState<PostParams[]>([]);
   const [currPage, setCurrPage] = useState(1);
   const [totalPosts, setTotalPosts] = useState(0);
   const [postsPerPage, setPostsPerPage] = useState(10);
@@ -22,14 +24,15 @@ const App = () => {
   const NOTES_URL = "http://localhost:3001/notes";
 
   useEffect(() => {
-    axios
-      .get(NOTES_URL + `?_page=${currPage}` + `&_limit=${postsPerPage}`)
+    // axios
+    //   .get(NOTES_URL + `?_page=${currPage}` + `&_limit=${postsPerPage}`)
+    getPage(
+      currPage,
+      calcPagesRange().length ? calcPagesRange() : [1, 2, 3, 4, 5]
+    )
       .then((res) => {
-        // res.headers["x-total-count"] &&     TODO?
         setTotalPosts(+res.headers["x-total-count"]);
-        setPosts(
-          res.data // TODO sort?
-        );
+        setPosts(res.data);
       })
       .catch((error) => {
         console.log("Encountered an error:" + error);
@@ -109,7 +112,10 @@ const App = () => {
   };
   return (
     <div className={`app ${theme}`}>
-      <button onClick={() => setTheme(theme === "light" ? "dark" : "light")} name='change_theme'>
+      <button
+        onClick={() => setTheme(theme === "light" ? "dark" : "light")}
+        name="change_theme"
+      >
         theme
       </button>
       <Header postsPerPage={postsPerPage} setPostsPerPage={setPostsInPage} />
