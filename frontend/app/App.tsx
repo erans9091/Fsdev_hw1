@@ -9,7 +9,7 @@ import Header from "./components/Header";
 // Types
 import { PostParams } from "./types";
 // Utils
-import { getPage } from "./utils/cache";
+import { getPage, deletePost ,addPost as addPostCacheWrap} from "./utils/cache";
 
 // import script from "../../scripts/generateNotes"
 
@@ -59,14 +59,15 @@ const App = () => {
   // title: string,
   // author: Author,
   // content: string
-  const addPost = (post: PostParams) => {
+  const addPost = async (post: PostParams) => {
     const lastPage = Math.ceil(totalPosts / postsPerPage);
     const updatePagination =
       currPage === lastPage ||
       (totalPosts % postsPerPage === 0 &&
         (currPage === lastPage - 1 || currPage === lastPage - 2));
-    axios
-      .post(NOTES_URL, { post })
+    // axios
+    //   .post(NOTES_URL, { post })
+    addPostCacheWrap(post)
       .then((res) => {
         res.status === 201 && updatePagination && setTotalPosts(totalPosts + 1);
         console.log("Post added successfully", res.status);
@@ -91,8 +92,9 @@ const App = () => {
   const deleteAction = async (ith: number) => {
     const curith = postsPerPage * (currPage - 1) + ith;
     console.log("Deleting post number: ", curith);
-    axios
-      .delete(NOTES_URL + "/" + curith)
+    // axios
+    //   .delete(NOTES_URL + "/" + curith)
+    deletePost(curith,currPage)
       .then((res) => {
         if (res.status == 204) {
           setTotalPosts((curr) => curr - 1);
