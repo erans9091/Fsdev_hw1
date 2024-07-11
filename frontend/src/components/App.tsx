@@ -3,13 +3,13 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 // Components
-import Page from "./components/Page";
-import Pagination from "./components/Pagination";
-import Header from "./components/Header";
+import Page from "./Page";
+import Pagination from "./Pagination";
+import Header from "./Header";
 // Types
-import { PostParams } from "./types";
+import { PostParams } from "../types";
 // Utils
-import { getPage, deletePost ,addPost as addPostCacheWrap} from "./utils/cache";
+import { getPage, deletePost, addPost as addPostCacheWrap } from "../utils/cache";
 
 // import script from "../../scripts/generateNotes"
 
@@ -94,7 +94,7 @@ const App = () => {
     console.log("Deleting post number: ", curith);
     // axios
     //   .delete(NOTES_URL + "/" + curith)
-    deletePost(curith,currPage)
+    deletePost(curith, currPage)
       .then((res) => {
         if (res.status == 204) {
           setTotalPosts((curr) => curr - 1);

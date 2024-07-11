@@ -40,3 +40,4 @@ package-lock.json
 # log files
 
 /server/log.txt
+*.zip
