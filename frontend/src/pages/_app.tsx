@@ -4,7 +4,7 @@ import SignupForm from "../components/Signup"
 import LoginForm from "../components/Login";
 import '../css/styles.css';
 import '../css/globals.css';
-const testLogin = true;
+const testLogin = false;
 export default function Home() {
   if (testLogin) {
     return (<>
