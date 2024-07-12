@@ -7,7 +7,7 @@ const LoginForm = ({ loginFunc }: any) => {
     const handleSubmit = (e: FormEvent) => {
         e.preventDefault();
         // Add your login logic here, for example, make an API call
-        loginFunc();
+        loginFunc(username, password);
     };
 
     return (

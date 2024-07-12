@@ -38,7 +38,7 @@ mongoose
   });
 
 app.use("/notes", notesRouter);
-app.use("/users", usersRouter);
+app.use("/signup", usersRouter);
 app.use("/login", loginRouter);
 
 

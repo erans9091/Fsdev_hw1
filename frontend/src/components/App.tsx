@@ -1,7 +1,6 @@
 "use client";
 // Libraries
 import { useState, useEffect } from "react";
-import axios from "axios";
 // Components
 import Page from "./Page";
 import Pagination from "./Pagination";
@@ -15,7 +14,6 @@ import {
   addPost as addPostCacheWrap,
   updatePost as updatePostCacheWrap,
 } from "../utils/cache";
-//import { getPage, deletePost, addPost as addPostCacheWrap } from "../utils/cache";
 
 import { setToken } from "../utils/fetchUtils";
 
@@ -26,11 +24,9 @@ const App = () => {
   const [totalPosts, setTotalPosts] = useState(0);
   const [postsPerPage, setPostsPerPage] = useState(10);
   const [theme, setTheme] = useState("light");
-  const [auth, SetAuth] = useState(undefined);
+  const [isLogin, setIsLogin] = useState(false);
 
   const NOTES_URL = "http://localhost:3001/notes";
-  const LOGIN_URL = "http://localhost:3001/login";
-  const SIGNUP_URL = "http://localhost:3001/signup";
 
   useEffect(() => {
     getPage(
@@ -68,8 +64,6 @@ const App = () => {
       currPage === lastPage ||
       (totalPosts % postsPerPage === 0 &&
         (currPage === lastPage - 1 || currPage === lastPage - 2));
-
-
     addPostCacheWrap(post)
       .then((res) => {
         res.status === 201 && updatePagination && setTotalPosts(totalPosts + 1);
@@ -121,11 +115,7 @@ const App = () => {
         console.error("Error deleting post:", error);
       });
   };
-  const signup = (name: String, email: String, un: String, pw: String) => {
-    axios.post(SIGNUP_URL).then(() => {
-      alert("user created");
-    });
-  }
+
   return (
     <div className={`app ${theme}`}>
       <button
@@ -142,41 +132,13 @@ const App = () => {
         updatePost={updatePost}
         deleteAction={deleteAction}
       />
-      <button onClick={() => SetAuth(undefined)}>Logout</button>
+      <button onClick={() => setIsLogin(false)}>Logout</button>
       <Pagination
         currPage={currPage}
         setCurrPage={setCurrPage}
         pagesRange={calcPagesRange()}
         maxPage={Math.ceil(totalPosts / postsPerPage)}
       />
-      <button
-        onClick={() => {
-          axios.post("http://localhost:3001/users", {
-            user: {
-              username: "test123",
-              name: "test",
-              password: "test",
-              email: "test@d.com",
-            },
-          });
-        }}
-      >
-        {" "}
-        send post to '/users' login massage
-      </button>
-
-      <button
-        onClick={() => {
-          axios.post("http://localhost:3001/login", {
-            user: { username: "test123", password: "test" },
-          }).then((res) => {
-            setToken(res.data.token);
-          });
-        }}
-      >
-        {" "}
-        send post to '/login' login massage
-      </button>
     </div>
   );
 };

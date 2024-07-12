@@ -7,7 +7,7 @@ const SignupForm = ({ creatFunc }: { creatFunc: any }) => {
     const [pw, setPw] = useState("");
     const checkSubmit = (e: FormEvent) => {
         e.preventDefault();
-        name != "" && email != "" && un != "" && pw != "" && creatFunc();
+        name != "" && email != "" && un != "" && pw != "" && creatFunc(name, email, un, pw);
     }
     return (<div className="custom_form">
         <h2>Signup</h2>
