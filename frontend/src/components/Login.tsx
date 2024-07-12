@@ -11,7 +11,7 @@ const LoginForm = ({ loginFunc }: any) => {
     };
 
     return (
-        <>
+        <div className='custom_form'>
             <h2>Login</h2>
             <form onSubmit={handleSubmit} name='login_form'>
                 <input
@@ -21,7 +21,7 @@ const LoginForm = ({ loginFunc }: any) => {
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
                     required
-                />
+                /><br></br>
                 <input
                     type="password"
                     name='login_form_password'
@@ -29,10 +29,10 @@ const LoginForm = ({ loginFunc }: any) => {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
-                />
+                /><br></br>
                 <button type="submit">Login</button>
             </form>
-        </>
+        </div>
     );
 };
 

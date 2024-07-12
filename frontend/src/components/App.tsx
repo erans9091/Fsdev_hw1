@@ -20,8 +20,11 @@ const App = () => {
   const [totalPosts, setTotalPosts] = useState(0);
   const [postsPerPage, setPostsPerPage] = useState(10);
   const [theme, setTheme] = useState("light");
+  const [auth, SetAuth] = useState(undefined);
 
   const NOTES_URL = "http://localhost:3001/notes";
+  const LOGIN_URL = "http://localhost:3001/login";
+  const SIGNUP_URL = "http://localhost:3001/signup";
 
   useEffect(() => {
     // axios
@@ -112,6 +115,11 @@ const App = () => {
         console.error("Error updating post:", error);
       });
   };
+  const signup = (name: String, email: String, un: String, pw: String) => {
+    axios.post(SIGNUP_URL).then(() => {
+      alert("user created");
+    });
+  }
   return (
     <div className={`app ${theme}`}>
       <button
@@ -128,6 +136,7 @@ const App = () => {
         updatePost={updatePost}
         deleteAction={deleteAction}
       />
+      <button onClick={() => SetAuth(undefined)}>Logout</button>
       <Pagination
         currPage={currPage}
         setCurrPage={setCurrPage}
