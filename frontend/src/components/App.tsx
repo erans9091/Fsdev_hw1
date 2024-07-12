@@ -3,20 +3,21 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 // Components
-import Page from "./components/Page";
-import Pagination from "./components/Pagination";
-import Header from "./components/Header";
+import Page from "./Page";
+import Pagination from "./Pagination";
+import Header from "./Header";
 // Types
-import { PostParams } from "./types";
+import { PostParams } from "../types";
 // Utils
 import {
   getPage,
   deletePost,
   addPost as addPostCacheWrap,
   updatePost as updatePostCacheWrap,
-} from "./utils/cache";
+} from "../utils/cache";
+//import { getPage, deletePost, addPost as addPostCacheWrap } from "../utils/cache";
 
-import { setToken } from "./utils/fetchUtils";
+import { setToken } from "../utils/fetchUtils";
 
 const App = () => {
   // console.log(script())
@@ -25,8 +26,11 @@ const App = () => {
   const [totalPosts, setTotalPosts] = useState(0);
   const [postsPerPage, setPostsPerPage] = useState(10);
   const [theme, setTheme] = useState("light");
+  const [auth, SetAuth] = useState(undefined);
 
   const NOTES_URL = "http://localhost:3001/notes";
+  const LOGIN_URL = "http://localhost:3001/login";
+  const SIGNUP_URL = "http://localhost:3001/signup";
 
   useEffect(() => {
     getPage(
@@ -64,7 +68,7 @@ const App = () => {
       currPage === lastPage ||
       (totalPosts % postsPerPage === 0 &&
         (currPage === lastPage - 1 || currPage === lastPage - 2));
-    
+
 
     addPostCacheWrap(post)
       .then((res) => {
@@ -117,7 +121,11 @@ const App = () => {
         console.error("Error deleting post:", error);
       });
   };
-
+  const signup = (name: String, email: String, un: String, pw: String) => {
+    axios.post(SIGNUP_URL).then(() => {
+      alert("user created");
+    });
+  }
   return (
     <div className={`app ${theme}`}>
       <button
@@ -134,6 +142,7 @@ const App = () => {
         updatePost={updatePost}
         deleteAction={deleteAction}
       />
+      <button onClick={() => SetAuth(undefined)}>Logout</button>
       <Pagination
         currPage={currPage}
         setCurrPage={setCurrPage}

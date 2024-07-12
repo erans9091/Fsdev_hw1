@@ -1,7 +1,5 @@
 import { Page } from "../types";
 
-import "../styles.css";
-
 const Pagination = ({
   currPage,
   setCurrPage,
@@ -48,7 +46,7 @@ const Pagination = ({
       </button>
       {pagesRange.map((i) => (
         <button
-          key={"page-"+i}
+          key={"page-" + i}
           onClick={() => handlePageChange(i)}
           className={i === currPage ? "current" : ""}
           name={"page-" + i}
