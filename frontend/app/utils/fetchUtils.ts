@@ -19,3 +19,8 @@ export const addRequest = async (post: PostParams) => {
   const res = await axios.post(NOTES_URL, { post });
   return res;
 };
+
+export const updatePostRequest = async (ith: number, post: PostParams) => {
+  const res = await axios.put(NOTES_URL + "/" + ith, { post });
+  return res;
+};

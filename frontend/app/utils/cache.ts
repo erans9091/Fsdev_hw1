@@ -1,5 +1,5 @@
 import { PostParams } from "../types";
-import { fetchPage, deleteRequest, addRequest } from "./fetchUtils";
+import { fetchPage, deleteRequest, addRequest , updatePostRequest} from "./fetchUtils";
 
 type Cache = {
   scope: number[];
@@ -8,6 +8,9 @@ type Cache = {
   };
   "x-total-count": string;
   key: number;
+  pendingRequests: {
+    [key: number]: Promise<void>;
+  };
 };
 
 type Response = {
@@ -22,63 +25,64 @@ const cache: Cache = {
   pages: {},
   "x-total-count": "-1",
   key: 1,
+  pendingRequests: {},
 };
 
-const getKey = async () => {
+const getKey = async (func?: string) => {
   while (cache.key !== 1) {
+    console.log("waiting for key: ", func);
     await new Promise((resolve) => setTimeout(resolve, 500));
   }
-  console.log("getKey");
   cache.key = 0;
 };
 
 const releaseKey = () => {
-  console.log("releaseKey");
   cache.key = 1;
 };
 
-const fetchNCache = async (pageNumber: number) => {
-  const res = await fetchPage(pageNumber);
-  if (res.data.length === 0) {
-    return { data: [], headers: { "x-total-count": cache["x-total-count"] } };
-  }
-  +res.headers["x-total-count"] &&
-    updateTotalCount(res.headers["x-total-count"]);
-  cachePage(pageNumber, res.data);
-  return {
-    data: res.data,
-    headers: { "x-total-count": res.headers["x-total-count"] },
+const read = async (pageNumber: number): Promise<Response> => {
+  const posts = cache.pages[pageNumber] || [];
+  const res = {
+    data: posts,
+    headers: { "x-total-count": cache["x-total-count"] },
   };
-};
-const updateScope = async (scope: number[]) => {
-  await getKey();
-  cache.scope = scope;
-  // clear cache
-  Object.keys(cache.pages).forEach((pageNumber) => {
-    if (!scope.includes(+pageNumber)) {
-      console.log("deleting page from cache", pageNumber);
-      delete cache.pages[+pageNumber];
-    }
-  });
-  // update cache
-  scope.forEach(async (pageNumber) => {
-    if (cache.pages[pageNumber]) {
-      return;
-    }
-    console.log("fetching page", pageNumber);
-    fetchNCache(pageNumber);
-  });
-  releaseKey();
+  return res;
 };
 
-const updateCacheFromPageUnsafe = async (pageNumber: number) => {
-  cache.scope.forEach(async (pageInScope) => {
-    if (pageInScope < pageNumber) {
-      return;
-    }
-    console.log("updating page", pageInScope);
-    await fetchNCache(pageInScope);
-  });
+const fetchAndCachePage = async (pageNumber: number) => {
+  if (!(pageNumber in cache.pendingRequests)) {
+    cache.pendingRequests[pageNumber] = (async () => {
+      const res = await fetchPage(pageNumber);
+
+      // Update the cache
+      cachePage(pageNumber, res.data);
+      updateTotalCount(res.headers["x-total-count"]);
+
+      // Remove the pending request once it is fulfilled
+      delete cache.pendingRequests[pageNumber];
+    })();
+  }
+
+  // Wait for the pending request to complete
+  await cache.pendingRequests[pageNumber];
+};
+
+const updatePages = async (scope: number[]) => {
+  cache.scope = scope;
+
+  // Clear cache
+  const pagesToClear = Object.keys(cache.pages).filter(
+    (pageNumber) => !scope.includes(+pageNumber)
+  );
+  await deletePages(pagesToClear.map((pageNumber) => +pageNumber));
+
+  // Update cache
+  const pagesToFetch = scope.filter((pageNumber) => !cache.pages[pageNumber]);
+  await Promise.all(
+    pagesToFetch.map((pageNumber) => fetchAndCachePage(pageNumber))
+  );
+
+  console.log("cache", cache);
 };
 
 const updateTotalCount = (total: string) => {
@@ -89,105 +93,107 @@ const cachePage = (pageNumber: number, posts: PostParams[]) => {
   cache.pages[pageNumber] = posts;
 };
 
-const getPageAndUpdateUnsafe = async (
-  pageNumber: number,
-  scope: number[]
-): Promise<Response> => {
-  if (cache.pages[pageNumber]) {
-    return {
-      data: cache.pages[pageNumber],
-      headers: { "x-total-count": cache["x-total-count"] },
-    };
-  }
-  console.log("fetching page getPageAndUpdate", pageNumber);
-  const res = await fetchNCache(pageNumber);
-  updateScope(scope); // releases the key
-  return res;
-};
-
 const firstFetch = async () => {
   if (cache["x-total-count"] !== "-1") {
     return;
   }
-  fetchNCache(1);
+  await updatePages([1, 2, 3, 4, 5]);
 };
 
-export const getPage = async (
+const getPage = async (
   pageNumber: number,
   scope: number[]
 ): Promise<Response> => {
-  let res: Response = {} as Response;
-
-  await getKey();
-  await firstFetch();
-
-  if (JSON.stringify(scope) === JSON.stringify(cache.scope)) {
-    console.log("cache hit");
-    res.data = cache.pages[pageNumber];
-    releaseKey();
-  } else if (pageNumber in cache.pages) {
-    console.log("page in cahce updating scope");
-    res.data = cache.pages[pageNumber];
-    releaseKey();
-    updateScope(scope);
-  } else {
-    console.log("page not in cache");
-    res = await getPageAndUpdateUnsafe(pageNumber, scope);
-    releaseKey();
+  if (cache["x-total-count"] === "-1") {
+    await firstFetch();
   }
 
-  res.headers = { "x-total-count": cache["x-total-count"] };
-  return res;
+  // Return the cached page immediately if available
+  if (pageNumber in cache.pages) {
+    const res = await read(pageNumber);
+    console.log("Returning cached page immediately:", pageNumber);
+
+    // Update the scope and fetch missing pages in the background
+    setTimeout(async () => {
+      await updatePages(scope);
+    }, 0);
+
+    return res;
+  } else {
+    console.log("Page not in cache:", pageNumber);
+
+    // Update the scope and fetch the page and missing pages
+    await updatePages(scope);
+
+    // Return the fetched page
+    const res = await read(pageNumber);
+    return res;
+  }
 };
 
-export const deletePost = async (
-  ith: number,
-  currPage: number
-): Promise<{ status: number }> => {
+const deletePages = async (pageNumbers: number[]) => {
+  await getKey();
+  pageNumbers.forEach((pageNumber) => {
+    if (cache.pages[pageNumber]) {
+      delete cache.pages[pageNumber];
+    }
+  });
+  releaseKey();
+};
+const deletePost = async (ith: number, currPage: number) => {
   await getKey();
   const res = await deleteRequest(ith);
-
   if (res.status === 204) {
-    const lastPage = Math.ceil(+cache["x-total-count"] / 10);
+    // Calculate the new total count
+    const newTotalCount = +cache["x-total-count"] - 1;
+    cache["x-total-count"] = newTotalCount.toString();
 
-    cache["x-total-count"] = (+cache["x-total-count"] - 1).toString();
+    const lastPage = Math.ceil(newTotalCount / 10);
 
-    const shouldRemovePage =
-      +cache["x-total-count"] % 10 === 0 && currPage === lastPage;
+    // Check if we need to remove the last page from the cache
+    if (newTotalCount % 10 === 0 && currPage > lastPage) {
+      delete cache.pages[currPage];
+      currPage = lastPage;
+    }
 
-    shouldRemovePage &&
-      cache.scope.map((page, i) => {
-        if (page === 0) {
-          return;
-        }
-        cache.scope[i] = page - 1;
-      });
-    shouldRemovePage && releaseKey();
-    shouldRemovePage
-      ? updateScope(cache.scope)
-      : updateCacheFromPageUnsafe(currPage).then(() => {
-          releaseKey();
-        });
-  } else {
-    releaseKey();
+    // Fetch the current page
+    await fetchAndCachePage(currPage);
+
+    // Refetch subsequent pages in the background
+    const pagesToRefetch = [];
+    for (let i = currPage + 1; i <= lastPage; i++) {
+      if (i in cache.pages) {
+        pagesToRefetch.push(fetchAndCachePage(i));
+      }
+    }
+
+    await Promise.all(pagesToRefetch);
   }
-
+  releaseKey();
   return res;
 };
 
-export const addPost = async (
-  post: PostParams
-): Promise<{ status: number }> => {
+const addPost = async (post: PostParams) => {
   await getKey();
   const res = await addRequest(post);
   if (res.status === 201) {
     const lastPage = Math.ceil(+cache["x-total-count"] / 10);
     cache["x-total-count"] = (+cache["x-total-count"] + 1).toString();
-    updateCacheFromPageUnsafe(lastPage).then(() => {
-      releaseKey();
-    });
-  } else {
-    releaseKey();
+    await fetchAndCachePage(lastPage);
   }
+  releaseKey();
   return res;
 };
+
+const updatePost = async (ith: number, post: PostParams, pageNumber: number) => {
+    await getKey();
+    const res = await updatePostRequest(ith, post);
+    if (res.status === 200) {
+      // Fetch the current page to ensure the cache is updated correctly
+      await fetchAndCachePage(pageNumber);
+    }
+    releaseKey();
+    return res;
+  };
+
+export { getPage, deletePost, addPost , updatePost};

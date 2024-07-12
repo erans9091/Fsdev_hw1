@@ -9,12 +9,15 @@ import Header from "./components/Header";
 // Types
 import { PostParams } from "./types";
 // Utils
-import { getPage, deletePost ,addPost as addPostCacheWrap} from "./utils/cache";
-
-// import script from "../../scripts/generateNotes"
+import {
+  getPage,
+  deletePost,
+  addPost as addPostCacheWrap,
+  updatePost as updatePostCacheWrap,
+} from "./utils/cache";
 
 const App = () => {
-  //   console.log(script())
+  // console.log(script())
   const [posts, setPosts] = useState<PostParams[]>([]);
   const [currPage, setCurrPage] = useState(1);
   const [totalPosts, setTotalPosts] = useState(0);
@@ -24,8 +27,6 @@ const App = () => {
   const NOTES_URL = "http://localhost:3001/notes";
 
   useEffect(() => {
-    // axios
-    //   .get(NOTES_URL + `?_page=${currPage}` + `&_limit=${postsPerPage}`)
     getPage(
       currPage,
       calcPagesRange().length ? calcPagesRange() : [1, 2, 3, 4, 5]
@@ -55,21 +56,19 @@ const App = () => {
     setPostsPerPage(numberOfPosts);
   };
 
-  // id: number,
-  // title: string,
-  // author: Author,
-  // content: string
   const addPost = async (post: PostParams) => {
     const lastPage = Math.ceil(totalPosts / postsPerPage);
     const updatePagination =
       currPage === lastPage ||
       (totalPosts % postsPerPage === 0 &&
         (currPage === lastPage - 1 || currPage === lastPage - 2));
-    // axios
-    //   .post(NOTES_URL, { post })
+
     addPostCacheWrap(post)
       .then((res) => {
         res.status === 201 && updatePagination && setTotalPosts(totalPosts + 1);
+        if (res.status === 201) {
+          setTotalPosts(totalPosts + 1);
+        }
         console.log("Post added successfully", res.status);
       })
       .catch((error) => {
@@ -78,40 +77,44 @@ const App = () => {
       });
     return 0;
   };
+
   const updatePost = async (
     ith: number,
     post: PostParams,
     thenf: (res: any) => void
   ) => {
     const curith = postsPerPage * (currPage - 1) + ith;
-    axios
-      .put(NOTES_URL + "/" + curith, { post })
+    // axios
+    //   .put(NOTES_URL + "/" + curith, { post })
+    updatePostCacheWrap(curith, post, currPage)
       .then(thenf)
       .catch((error) => console.error("Error updating post:", error));
   };
+
   const deleteAction = async (ith: number) => {
     const curith = postsPerPage * (currPage - 1) + ith;
     console.log("Deleting post number: ", curith);
-    // axios
-    //   .delete(NOTES_URL + "/" + curith)
-    deletePost(curith,currPage)
+    deletePost(curith, currPage)
       .then((res) => {
-        if (res.status == 204) {
+        if (res.status === 204) {
           setTotalPosts((curr) => curr - 1);
-          if (totalPosts === curith && totalPosts % postsPerPage === 1) {
-            //means we deleted the last post in the current page
-            setCurrPage(currPage - 1);
+
+          // Determine whether to decrement the current page
+          const newTotalPosts = totalPosts - 1;
+          const lastPage = Math.ceil(newTotalPosts / postsPerPage);
+
+          if (currPage > lastPage && newTotalPosts % postsPerPage === 0) {
+            setCurrPage(lastPage);
           }
-          console.log("Post deleted succesfully");
-        } else if (res.status == 500) {
-          console.log("Can't deleted post");
         }
+        console.log("Post deleted successfully:", res.status);
       })
       .catch((error) => {
         console.log("Error deleting post:");
-        console.error("Error updating post:", error);
+        console.error("Error deleting post:", error);
       });
   };
+
   return (
     <div className={`app ${theme}`}>
       <button
