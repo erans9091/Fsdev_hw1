@@ -16,6 +16,8 @@ import {
   updatePost as updatePostCacheWrap,
 } from "./utils/cache";
 
+import { setToken } from "./utils/fetchUtils";
+
 const App = () => {
   // console.log(script())
   const [posts, setPosts] = useState<PostParams[]>([]);
@@ -62,6 +64,7 @@ const App = () => {
       currPage === lastPage ||
       (totalPosts % postsPerPage === 0 &&
         (currPage === lastPage - 1 || currPage === lastPage - 2));
+    
 
     addPostCacheWrap(post)
       .then((res) => {
@@ -137,6 +140,34 @@ const App = () => {
         pagesRange={calcPagesRange()}
         maxPage={Math.ceil(totalPosts / postsPerPage)}
       />
+      <button
+        onClick={() => {
+          axios.post("http://localhost:3001/users", {
+            user: {
+              username: "test123",
+              name: "test",
+              password: "test",
+              email: "test@d.com",
+            },
+          });
+        }}
+      >
+        {" "}
+        send post to '/users' login massage
+      </button>
+
+      <button
+        onClick={() => {
+          axios.post("http://localhost:3001/login", {
+            user: { username: "test123", password: "test" },
+          }).then((res) => {
+            setToken(res.data.token);
+          });
+        }}
+      >
+        {" "}
+        send post to '/login' login massage
+      </button>
     </div>
   );
 };

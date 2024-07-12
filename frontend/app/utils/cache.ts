@@ -188,10 +188,10 @@ const addPost = async (post: PostParams) => {
 const updatePost = async (ith: number, post: PostParams, pageNumber: number) => {
     await getKey();
     const res = await updatePostRequest(ith, post);
-    if (res.status === 200) {
-      // Fetch the current page to ensure the cache is updated correctly
-      await fetchAndCachePage(pageNumber);
-    }
+    // if (res.status === 200) {
+    //   // Fetch the current page to ensure the cache is updated correctly
+    //   await fetchAndCachePage(pageNumber);
+    // }
     releaseKey();
     return res;
   };

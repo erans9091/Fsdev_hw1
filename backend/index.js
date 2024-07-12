@@ -13,6 +13,7 @@ const config = require("./utils/config");
 // Routers
 const notesRouter = require("./controllers/notes");
 const usersRouter = require("./controllers/users");
+const loginRouter = require("./controllers/login");
 
 const app = express();
 const corsOptions = {
@@ -38,6 +39,8 @@ mongoose
 
 app.use("/notes", notesRouter);
 app.use("/users", usersRouter);
+app.use("/login", loginRouter);
+
 
 app.get("/", (req, res) => {
   res.send("server is running!");
