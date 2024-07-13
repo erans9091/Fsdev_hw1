@@ -76,10 +76,17 @@ notesRouter.post("/", async (req, res) => {
     .catch(() => res.status(400).send("can't add"));
 });
 notesRouter.put("/:ith", async (req, res) => {
+  if (!decodedToken.id) {
+    return res.status(401).json({ error: 'token invalid' })
+  }
   const ith = parseInt(req.params.ith);
   const newNote = req.body.put;
 
   const note = await Note.findOne().skip(ith - 1);
+  const user = await User.findById(decodedToken.id)
+  if (note.author.name != user.name) {
+    return res.status(403).json({ error: 'cant have access to this post' })
+  }
   note
     ? updateNote(note._id, newNote)
       .then(res.status(201).send("note updated"))
@@ -87,8 +94,16 @@ notesRouter.put("/:ith", async (req, res) => {
     : res.status(404).send("note not found");
 });
 notesRouter.delete("/:ith", async (req, res) => {
+  const decodedToken = jwt.verify(getTokenFrom(req), process.env.SECRET)
+  if (!decodedToken.id) {
+    return res.status(401).json({ error: 'token invalid' })
+  }
   const ith = parseInt(req.params.ith);
   const note = await Note.findOne().skip(ith - 1);
+  const user = await User.findById(decodedToken.id)
+  if (note.author.name != user.name) {
+    return res.status(403).json({ error: 'cant have access to this post' })
+  }
   note
     ? deleteNote(note._id).then(res.status(204).send("note deleted"))
     : res.status(404).send("note not found");
