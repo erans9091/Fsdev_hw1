@@ -45,7 +45,7 @@ const Page = ({
           cancel_func={() => setShowAddForm(false)}
         />
       ) : (
-        <button onClick={() => setShowAddForm(true)} name="add_new_note">
+        <button onClick={() => isLogin && setShowAddForm(true)} name="add_new_note">
           Add a new note
         </button>
       )}

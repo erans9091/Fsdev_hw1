@@ -29,15 +29,16 @@ const AddPostForm = ({
     e.preventDefault();
 
     if (!validateForm()) return;
-    addPost({
+    let temp = {
       title,
       content,
       author: {
         name: authorName,
         email: authorEmail,
       },
-    });
-    clearForm();
+    }
+    addPost(temp);
+    //clearForm();
   };
 
   return (

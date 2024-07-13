@@ -71,7 +71,6 @@ export const login = async (un: String, pw: String, setIsLogedin: Function) => {
       setIsLogedin(true);
       console.log(res.data.token);
       name = res.data.name;
-      console.log("name=",name,)
     } else {
       alert(res.status);
     }

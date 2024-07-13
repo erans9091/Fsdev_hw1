@@ -2,7 +2,8 @@ const notesRouter = require("express").Router();
 const Note = require("../models/note");
 const logger = require("../utils/logger").initLogger();
 const jwt = require('jsonwebtoken')
-const User = require('../models/user')
+const User = require('../models/user');
+const { log } = require("console");
 
 const getTokenFrom = request => {
   const authorization = request.get('authorization')
@@ -56,20 +57,20 @@ notesRouter.get("/", async (req, res, next) => {
   res.status(200).send("server is running!");
 });
 notesRouter.post("/", async (req, res) => {
-
   const decodedToken = jwt.verify(getTokenFrom(req), process.env.SECRET)
   if (!decodedToken.id) {
-    return response.status(401).json({ error: 'token invalid' })
+    return res.status(401).json({ error: 'token invalid' })
   }
   const user = await User.findById(decodedToken.id)
-
-  const newNote = req.body.post;
-
+  const newNote = req.body;
+  if (!newNote) {
+    return res.status(401).json({ error: 'post data undefined' });
+  }
   const count = await Note.collection.countDocuments();
 
   const last = await Note.findOne().skip(count - 1);
   const lastId = last.id || 0;
-
+  console.log(newNote);
   await Note.create({ ...newNote, id: lastId + 1 })
     .then((obj) => res.status(201).send(obj._id))
     .catch(() => res.status(400).send("can't add"));
@@ -81,8 +82,8 @@ notesRouter.put("/:ith", async (req, res) => {
   const note = await Note.findOne().skip(ith - 1);
   note
     ? updateNote(note._id, newNote)
-        .then(res.status(201).send("note updated"))
-        .catch(() => res.status(400).send("can't update"))
+      .then(res.status(201).send("note updated"))
+      .catch(() => res.status(400).send("can't update"))
     : res.status(404).send("note not found");
 });
 notesRouter.delete("/:ith", async (req, res) => {
