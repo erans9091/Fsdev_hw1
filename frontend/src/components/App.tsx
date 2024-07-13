@@ -5,6 +5,8 @@ import { useState, useEffect } from "react";
 import Page from "./Page";
 import Pagination from "./Pagination";
 import Header from "./Header";
+import SignupForm from "./Signup"
+import LoginForm from "./Login";
 // Types
 import { PostParams } from "../types";
 // Utils
@@ -15,8 +17,8 @@ import {
   updatePost as updatePostCacheWrap,
 } from "../utils/cache";
 
-import { setToken } from "../utils/fetchUtils";
-
+import { setToken, getName } from "../utils/fetchUtils";
+import { signup, loginRap as login } from '../utils/fetchUtils'
 const App = () => {
   // console.log(script())
   const [posts, setPosts] = useState<PostParams[]>([]);
@@ -118,6 +120,8 @@ const App = () => {
 
   return (
     <div className={`app ${theme}`}>
+      <SignupForm creatFunc={signup}></SignupForm>
+      <LoginForm loginFunc={login(setIsLogin)}></LoginForm>
       <button
         onClick={() => setTheme(theme === "light" ? "dark" : "light")}
         name="change_theme"
@@ -131,8 +135,10 @@ const App = () => {
         addPost={addPost}
         updatePost={updatePost}
         deleteAction={deleteAction}
+        isLogin={isLogin}
+        name={getName()}
       />
-      <button onClick={() => setIsLogin(false)}>Logout</button>
+      <button onClick={() => { setIsLogin(false); setToken(""); }}>Logout</button>
       <Pagination
         currPage={currPage}
         setCurrPage={setCurrPage}

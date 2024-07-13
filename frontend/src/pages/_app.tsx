@@ -5,7 +5,7 @@ import LoginForm from "../components/Login";
 import '../css/styles.css';
 import '../css/globals.css';
 import { signup, loginRap as login } from '../utils/fetchUtils'
-const testLogin = true;
+const testLogin = false;
 export default function Home() {
   if (testLogin) {
     return (<>

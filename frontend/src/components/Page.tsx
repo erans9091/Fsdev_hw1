@@ -9,6 +9,8 @@ const Page = ({
   addPost,
   updatePost,
   deleteAction,
+  isLogin,
+  name
 }: {
   posts: PostParams[];
   pageNumber: number;
@@ -19,6 +21,8 @@ const Page = ({
     thenf: (res: any) => void
   ) => void;
   deleteAction: (ith: number) => void;
+  isLogin: boolean;
+  name: String;
 }) => {
   const [showAddForm, setShowAddForm] = useState(false);
   return (
@@ -31,9 +35,11 @@ const Page = ({
           updatePost={updatePost}
           ith={index + 1}
           deleteAction={deleteAction}
+          isLogin={isLogin}
+          name={name}
         />
       ))}
-      {showAddForm ? (
+      {showAddForm && isLogin ? (
         <AddPostForm
           addPost={addPost}
           cancel_func={() => setShowAddForm(false)}

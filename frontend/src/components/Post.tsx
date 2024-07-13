@@ -6,12 +6,16 @@ const Post = ({
   post,
   updatePost,
   ith,
-  deleteAction
+  deleteAction,
+  isLogin,
+  name
 }: {
   post: PostParams;
   updatePost: (ith: number, post: PostParams, thenf: (res: any) => void) => void;
   ith: number;
   deleteAction: (ith: number) => void;
+  isLogin: boolean;
+  name: String;
 }) => {
   const [content, updateContent] = useState(post.content);
   const [isEdit, setIsEdit] = useState(false);
@@ -41,13 +45,14 @@ const Post = ({
       }
     });
   };
+  const isMy = () => isLogin && post.author.name === name
 
   return (
     <div className="note" id={"" + post.id} key={post.id}>
       <h2>{post.title}</h2>
       <h3>{post.author.name}</h3>
       <p>{post.content}</p>
-      {!isEdit && (
+      {!isEdit && isMy() && (
         <button name={"edit-" + post.id} onClick={() => setIsEdit(true)}>
           edit
         </button>
@@ -76,9 +81,9 @@ const Post = ({
         </>
       )}
       <br></br>
-      <button name={"delete-" + post.id} onClick={() => deleteAction(ith)}>
+      {isMy() && <button name={"delete-" + post.id} onClick={() => deleteAction(ith)}>
         delete
-      </button>
+      </button>}
     </div>
   );
 };
