@@ -7,14 +7,14 @@ const Post = ({
   updatePost,
   ith,
   deleteAction,
-  isLogin,
+  isLoggedin,
   name
 }: {
   post: PostParams;
   updatePost: (ith: number, post: PostParams, thenf: (res: any) => void) => void;
   ith: number;
   deleteAction: (ith: number) => void;
-  isLogin: boolean;
+  isLoggedin: boolean;
   name: String;
 }) => {
   const [content, updateContent] = useState(post.content);
@@ -45,7 +45,7 @@ const Post = ({
       }
     });
   };
-  const isMy = () => isLogin && post.author.name === name
+  const isMy = () => isLoggedin && post.author.name === name
 
   return (
     <div className="note" id={"" + post.id} key={post.id}>

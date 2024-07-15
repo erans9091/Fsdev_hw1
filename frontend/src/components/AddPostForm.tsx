@@ -5,24 +5,26 @@ import { PostParams } from "../types";
 const AddPostForm = ({
   addPost,
   cancel_func,
+  name,
 }: {
   addPost: (post: PostParams) => void;
   cancel_func: any;
+  name: string;
 }) => {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
-  const [authorName, setAuthorName] = useState("");
+  // const [authorName, setAuthorName] = useState("");
   const [authorEmail, setAuthorEmail] = useState("");
 
   const clearForm = () => {
     setTitle("");
     setContent("");
-    setAuthorName("");
+    // setAuthorName("");
     setAuthorEmail("");
   };
 
   const validateForm = () => {
-    return title && content && authorName && authorEmail;
+    return title && content && authorEmail;
   };
 
   const handleSubmit = (e: FormEvent) => {
@@ -33,10 +35,10 @@ const AddPostForm = ({
       title,
       content,
       author: {
-        name: authorName,
+        name,
         email: authorEmail,
       },
-    }
+    };
     addPost(temp);
     //clearForm();
   };
@@ -67,9 +69,9 @@ const AddPostForm = ({
           Author name:
           <input
             type="text"
-            value={authorName}
-            onChange={(e) => setAuthorName(e.target.value)}
-            name="text_input_author_new_note"
+            value={name}
+            disabled
+            name="text_input_name_new_note"
           ></input>
         </label>
         <label>

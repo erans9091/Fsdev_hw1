@@ -75,8 +75,8 @@ h6 {
   border: 1px solid #ccc;
   box-shadow: 0 10px 10px rgba(0, 0, 0, 0.1);
   border-radius: 10px;
+  overflow: scroll;
 }
-
 
 li.sh {
   background-color: #0e47f1;

@@ -10,7 +10,7 @@ const getTokenFrom = request => {
   if (authorization && authorization.startsWith('Bearer ')) {
     return authorization.replace('Bearer ', '')
   }
-  return null
+  return "null"
 }
 
 notesRouter.use((req, res, next) => {
@@ -76,6 +76,7 @@ notesRouter.post("/", async (req, res) => {
     .catch(() => res.status(400).send("can't add"));
 });
 notesRouter.put("/:ith", async (req, res) => {
+  const decodedToken = jwt.verify(getTokenFrom(req), process.env.SECRET)
   if (!decodedToken.id) {
     return res.status(401).json({ error: 'token invalid' })
   }

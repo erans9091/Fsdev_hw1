@@ -5,7 +5,7 @@ import { useState, useEffect } from "react";
 import Page from "./Page";
 import Pagination from "./Pagination";
 import Header from "./Header";
-import SignupForm from "./Signup"
+import SignupForm from "./Signup";
 import LoginForm from "./Login";
 // Types
 import { PostParams } from "../types";
@@ -17,8 +17,12 @@ import {
   updatePost as updatePostCacheWrap,
 } from "../utils/cache";
 
-import { setToken, getName } from "../utils/fetchUtils";
-import { signup, loginRap as login } from '../utils/fetchUtils'
+import {
+  setToken,
+  getName,
+  signup,
+  loginRap as login,
+} from "../utils/fetchUtils";
 const App = () => {
   // console.log(script())
   const [posts, setPosts] = useState<PostParams[]>([]);
@@ -26,7 +30,7 @@ const App = () => {
   const [totalPosts, setTotalPosts] = useState(0);
   const [postsPerPage, setPostsPerPage] = useState(10);
   const [theme, setTheme] = useState("light");
-  const [isLogin, setIsLogin] = useState(false);
+  const [isLoggedin, setIsLoggedin] = useState(false);
 
   const NOTES_URL = "http://localhost:3001/notes";
 
@@ -118,10 +122,11 @@ const App = () => {
       });
   };
 
+  console.log("isLoggedin", isLoggedin);
   return (
     <div className={`app ${theme}`}>
-      <SignupForm creatFunc={signup}></SignupForm>
-      <LoginForm loginFunc={login(setIsLogin)}></LoginForm>
+      {!isLoggedin && <SignupForm creatFunc={signup} />}
+      {!isLoggedin && <LoginForm loginFunc={login(setIsLoggedin)} />}
       <button
         onClick={() => setTheme(theme === "light" ? "dark" : "light")}
         name="change_theme"
@@ -135,10 +140,17 @@ const App = () => {
         addPost={addPost}
         updatePost={updatePost}
         deleteAction={deleteAction}
-        isLogin={isLogin}
+        isLoggedin={isLoggedin}
         name={getName()}
       />
-      <button onClick={() => { setIsLogin(false); setToken(""); }}>Logout</button>
+      <button
+        onClick={() => {
+          setIsLoggedin(false);
+          setToken("");
+        }}
+      >
+        Logout
+      </button>
       <Pagination
         currPage={currPage}
         setCurrPage={setCurrPage}

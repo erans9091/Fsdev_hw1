@@ -14,7 +14,11 @@ export const fetchPage = async (page: number, postsPerPage = 10) => {
 };
 
 export const deleteRequest = async (ith: number) => {
-  const res = await axios.delete(`${NOTES_URL}/${ith}`);
+  const res = await axios.delete(`${NOTES_URL}/${ith}`,{
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
   return res;
 };
 
@@ -29,7 +33,11 @@ export const addRequest = async (post: PostParams) => {
 };
 
 export const updatePostRequest = async (ith: number, post: PostParams) => {
-  const res = await axios.put(NOTES_URL + "/" + ith, { post });
+  const res = await axios.put(NOTES_URL + "/" + ith, { post },{
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
   return res;
 };
 
@@ -52,13 +60,13 @@ export const signup = async (name: String, email: String, un: String, pw: String
       alert(res.status);
     }
   }).catch((err) => {
-    alert("cant creat user");
+    alert("cant create user");
     console.log(err)
   });
   return res;
 }
 
-export const login = async (un: String, pw: String, setIsLogedin: Function) => {
+export const login = async (un: String, pw: String, setIsLoggedin: Function) => {
   const res = await axios.post(LOGIN_URL, {
     user: {
       username: un,
@@ -68,8 +76,7 @@ export const login = async (un: String, pw: String, setIsLogedin: Function) => {
     if (res.status == 200) {
       alert("user logedin");
       setToken(res.data.token);
-      setIsLogedin(true);
-      console.log(res.data.token);
+      setIsLoggedin(true);
       name = res.data.name;
     } else {
       alert(res.status);

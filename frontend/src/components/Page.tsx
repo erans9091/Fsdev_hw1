@@ -9,7 +9,7 @@ const Page = ({
   addPost,
   updatePost,
   deleteAction,
-  isLogin,
+  isLoggedin,
   name
 }: {
   posts: PostParams[];
@@ -21,8 +21,8 @@ const Page = ({
     thenf: (res: any) => void
   ) => void;
   deleteAction: (ith: number) => void;
-  isLogin: boolean;
-  name: String;
+  isLoggedin: boolean;
+  name: string;
 }) => {
   const [showAddForm, setShowAddForm] = useState(false);
   return (
@@ -35,17 +35,18 @@ const Page = ({
           updatePost={updatePost}
           ith={index + 1}
           deleteAction={deleteAction}
-          isLogin={isLogin}
+          isLoggedin={isLoggedin}
           name={name}
         />
       ))}
-      {showAddForm && isLogin ? (
+      {showAddForm && isLoggedin ? (
         <AddPostForm
           addPost={addPost}
           cancel_func={() => setShowAddForm(false)}
+          name={name}
         />
       ) : (
-        <button onClick={() => isLogin && setShowAddForm(true)} name="add_new_note">
+        isLoggedin && <button onClick={() => isLoggedin && setShowAddForm(true)} name="add_new_note">
           Add a new note
         </button>
       )}
