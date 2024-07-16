@@ -6,25 +6,27 @@ const AddPostForm = ({
   addPost,
   cancel_func,
   name,
+  email,
 }: {
   addPost: (post: PostParams) => void;
   cancel_func: any;
   name: string;
+  email: string;
 }) => {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   // const [authorName, setAuthorName] = useState("");
-  const [authorEmail, setAuthorEmail] = useState("");
+  // const [authorEmail, setAuthorEmail] = useState("");
 
   const clearForm = () => {
     setTitle("");
     setContent("");
     // setAuthorName("");
-    setAuthorEmail("");
+    // setAuthorEmail("");
   };
 
   const validateForm = () => {
-    return title && content && authorEmail;
+    return title && content;
   };
 
   const handleSubmit = (e: FormEvent) => {
@@ -36,7 +38,7 @@ const AddPostForm = ({
       content,
       author: {
         name,
-        email: authorEmail,
+        email,
       },
     };
     addPost(temp);
@@ -78,8 +80,8 @@ const AddPostForm = ({
           Author email:
           <input
             type="text"
-            value={authorEmail}
-            onChange={(e) => setAuthorEmail(e.target.value)}
+            value={email}
+            disabled
             name="text_input_email_new_note"
           ></input>
         </label>

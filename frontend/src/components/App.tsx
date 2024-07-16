@@ -20,6 +20,7 @@ import {
 import {
   setToken,
   getName,
+  getEmail,
   signup,
   loginRap as login,
 } from "../utils/fetchUtils";
@@ -157,6 +158,7 @@ const App = ({
         deleteAction={deleteAction}
         isLoggedin={isLoggedin}
         name={getName()}
+        email={getEmail()}
       />
       <Pagination
         currPage={currPage}

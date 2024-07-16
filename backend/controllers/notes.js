@@ -60,7 +60,6 @@ notesRouter.post("/", async (req, res) => {
   if (!decodedToken.id) {
     return res.status(401).json({ error: 'token invalid' })
   }
-  const user = await User.findById(decodedToken.id)
   const newNote = req.body;
   if (!newNote) {
     return res.status(401).json({ error: 'post data undefined' });
@@ -69,7 +68,7 @@ notesRouter.post("/", async (req, res) => {
 
   const last = await Note.findOne().skip(count - 1);
   const lastId = last.id || 0;
-  console.log(newNote);
+
   await Note.create({ ...newNote, id: lastId + 1 })
     .then((obj) => res.status(201).send(obj._id))
     .catch(() => res.status(400).send("can't add"));

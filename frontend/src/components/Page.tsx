@@ -10,7 +10,8 @@ const Page = ({
   updatePost,
   deleteAction,
   isLoggedin,
-  name
+  name,
+  email,
 }: {
   posts: PostParams[];
   pageNumber: number;
@@ -23,6 +24,7 @@ const Page = ({
   deleteAction: (ith: number) => void;
   isLoggedin: boolean;
   name: string;
+  email: string;
 }) => {
   const [showAddForm, setShowAddForm] = useState(false);
   return (
@@ -44,6 +46,7 @@ const Page = ({
           addPost={addPost}
           cancel_func={() => setShowAddForm(false)}
           name={name}
+          email={email}
         />
       ) : (
         isLoggedin && <button onClick={() => isLoggedin && setShowAddForm(true)} name="add_new_note">

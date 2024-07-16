@@ -6,6 +6,7 @@ const LOGIN_URL = "http://localhost:3001/login";
 const SIGNUP_URL = "http://localhost:3001/signup";
 let token = "";
 let name = ""
+let email = ""
 export const fetchPage = async (page: number, postsPerPage = 10) => {
   const res = await axios.get(
     `${NOTES_URL}?_page=${page}&_limit=${postsPerPage}`
@@ -48,8 +49,8 @@ export const setToken = (newToken: string) => {
 export const signup = async (name: String, email: String, un: String, pw: String) => {
   const res = await axios.post(SIGNUP_URL, {
     user: {
-      name: name,
-      email: email,
+      name,
+      email,
       username: un,
       password: pw
     }
@@ -78,6 +79,7 @@ export const login = async (un: String, pw: String, setIsLoggedin: Function) => 
       setToken(res.data.token);
       setIsLoggedin(true);
       name = res.data.name;
+      email = res.data.email;
     } else {
       alert(res.status);
     }
@@ -91,3 +93,5 @@ export const loginRap = (setlogin: Function): Function => {
   return (un: String, pw: String) => { login(un, pw, setlogin) }
 }
 export const getName = () => name;
+
+export const getEmail = () => email;
