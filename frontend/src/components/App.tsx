@@ -5,7 +5,7 @@ import { useState, useEffect } from "react";
 import Page from "./Page";
 import Pagination from "./Pagination";
 import Header from "./Header";
-import SignupForm from "./Signup";
+import SignupForm from "./SignupForm";
 import LoginForm from "./Login";
 // Types
 import { PostParams } from "../types";
@@ -23,11 +23,17 @@ import {
   signup,
   loginRap as login,
 } from "../utils/fetchUtils";
-const App = () => {
+const App = ({
+  posts: initialPosts,
+  totalCount,
+}: {
+  posts: PostParams[];
+  totalCount: number;
+}) => {
   // console.log(script())
-  const [posts, setPosts] = useState<PostParams[]>([]);
+  const [posts, setPosts] = useState<PostParams[]>(initialPosts);
   const [currPage, setCurrPage] = useState(1);
-  const [totalPosts, setTotalPosts] = useState(0);
+  const [totalPosts, setTotalPosts] = useState(totalCount);
   const [postsPerPage, setPostsPerPage] = useState(10);
   const [theme, setTheme] = useState("light");
   const [isLoggedin, setIsLoggedin] = useState(false);
@@ -122,11 +128,20 @@ const App = () => {
       });
   };
 
-  console.log("isLoggedin", isLoggedin);
   return (
     <div className={`app ${theme}`}>
       {!isLoggedin && <SignupForm creatFunc={signup} />}
       {!isLoggedin && <LoginForm loginFunc={login(setIsLoggedin)} />}
+      <br />
+      <button
+        onClick={() => {
+          setIsLoggedin(false);
+          setToken("");
+        }}
+      >
+        Logout
+      </button>
+      <br />
       <button
         onClick={() => setTheme(theme === "light" ? "dark" : "light")}
         name="change_theme"
@@ -143,14 +158,6 @@ const App = () => {
         isLoggedin={isLoggedin}
         name={getName()}
       />
-      <button
-        onClick={() => {
-          setIsLoggedin(false);
-          setToken("");
-        }}
-      >
-        Logout
-      </button>
       <Pagination
         currPage={currPage}
         setCurrPage={setCurrPage}

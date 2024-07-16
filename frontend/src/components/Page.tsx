@@ -28,7 +28,7 @@ const Page = ({
   return (
     <div className="page">
       <h1>Page {pageNumber}</h1>
-      {posts.map((post, index) => (
+      {posts?.map((post, index) => (
         <Post
           post={post}
           key={post.id}

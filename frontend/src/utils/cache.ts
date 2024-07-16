@@ -30,7 +30,6 @@ const cache: Cache = {
 
 const getKey = async (func?: string) => {
   while (cache.key !== 1) {
-    console.log("waiting for key: ", func);
     await new Promise((resolve) => setTimeout(resolve, 500));
   }
   cache.key = 0;
@@ -82,7 +81,6 @@ const updatePages = async (scope: number[]) => {
     pagesToFetch.map((pageNumber) => fetchAndCachePage(pageNumber))
   );
 
-  console.log("cache", cache);
 };
 
 const updateTotalCount = (total: string) => {
@@ -111,7 +109,7 @@ const getPage = async (
   // Return the cached page immediately if available
   if (pageNumber in cache.pages) {
     const res = await read(pageNumber);
-    console.log("Returning cached page immediately:", pageNumber);
+    // console.log("Returning cached page immediately:", pageNumber);
 
     // Update the scope and fetch missing pages in the background
     setTimeout(async () => {
@@ -120,7 +118,7 @@ const getPage = async (
 
     return res;
   } else {
-    console.log("Page not in cache:", pageNumber);
+    // console.log("Page not in cache:", pageNumber);
 
     // Update the scope and fetch the page and missing pages
     await updatePages(scope);
