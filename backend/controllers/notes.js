@@ -3,7 +3,6 @@ const Note = require("../models/note");
 const logger = require("../utils/logger").initLogger();
 const jwt = require('jsonwebtoken')
 const User = require('../models/user');
-const { log } = require("console");
 
 const getTokenFrom = request => {
   const authorization = request.get('authorization')
@@ -81,13 +80,14 @@ notesRouter.put("/:ith", async (req, res) => {
     return res.status(401).json({ error: 'token invalid' })
   }
   const ith = parseInt(req.params.ith);
-  const newNote = req.body.put;
+  const newNote = req.body.post;
 
   const note = await Note.findOne().skip(ith - 1);
   const user = await User.findById(decodedToken.id)
   if (note.author.name != user.name) {
     return res.status(403).json({ error: 'cant have access to this post' })
   }
+
   note
     ? updateNote(note._id, newNote)
       .then(res.status(201).send("note updated"))
