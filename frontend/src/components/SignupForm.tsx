@@ -1,4 +1,4 @@
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, useState } from "react";
 
 const SignupForm = ({ creatFunc }: { creatFunc: any }) => {
   const [name, setName] = useState("");
@@ -13,10 +13,17 @@ const SignupForm = ({ creatFunc }: { creatFunc: any }) => {
       pw != "" &&
       creatFunc(name, email, un, pw);
   };
+
+  const clearForm = () => {
+    setName("");
+    setEmail("");
+    setUn("");
+    setPw("");
+  };
   return (
     <div className="custom_form">
       <h2>Signup</h2>
-      <form name="create_user_form" onSubmit={checkSubmit}>
+      <form name="create_user_form" onSubmit={checkSubmit} onReset={clearForm}>
         <input
           type="text"
           name="create_user_form_name"
@@ -55,6 +62,9 @@ const SignupForm = ({ creatFunc }: { creatFunc: any }) => {
         <br></br>
         <button name="create_user_form_create_user" type="submit">
           Create User
+        </button>
+        <button name="create_user_form_cancel" type="reset">
+          Cancel
         </button>
       </form>
     </div>

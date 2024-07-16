@@ -13,7 +13,7 @@ const getTokenFrom = request => {
 }
 
 notesRouter.use((req, res, next) => {
-  logger.log(req.method, req.url, req.body);
+  logger.log(req.method, req.originalUrl, req.body);
   next();
 });
 

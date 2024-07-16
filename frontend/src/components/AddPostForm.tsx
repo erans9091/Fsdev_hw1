@@ -42,7 +42,7 @@ const AddPostForm = ({
       },
     };
     addPost(temp);
-    //clearForm();
+    clearForm();
   };
 
   return (

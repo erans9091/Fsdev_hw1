@@ -3,7 +3,7 @@ import axios from "axios";
 import { PostParams } from "../types";
 const NOTES_URL = "http://localhost:3001/notes";
 const LOGIN_URL = "http://localhost:3001/login";
-const SIGNUP_URL = "http://localhost:3001/signup";
+const SIGNUP_URL = "http://localhost:3001/users";
 let token = "";
 let name = ""
 let email = ""

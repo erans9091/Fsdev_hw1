@@ -134,7 +134,7 @@ const App = ({
       {!isLoggedin && <SignupForm creatFunc={signup} />}
       {!isLoggedin && <LoginForm loginFunc={login(setIsLoggedin)} />}
       <br />
-      <button
+      <button name="logout"
         onClick={() => {
           setIsLoggedin(false);
           setToken("");
