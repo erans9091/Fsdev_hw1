@@ -3,9 +3,10 @@ import axios from "axios";
 import { PostParams } from "../types";
 const NOTES_URL = "http://localhost:3001/notes";
 const LOGIN_URL = "http://localhost:3001/login";
-const SIGNUP_URL = "http://localhost:3001/signup";
+const SIGNUP_URL = "http://localhost:3001/users";
 let token = "";
 let name = ""
+let email = ""
 export const fetchPage = async (page: number, postsPerPage = 10) => {
   const res = await axios.get(
     `${NOTES_URL}?_page=${page}&_limit=${postsPerPage}`
@@ -14,7 +15,11 @@ export const fetchPage = async (page: number, postsPerPage = 10) => {
 };
 
 export const deleteRequest = async (ith: number) => {
-  const res = await axios.delete(`${NOTES_URL}/${ith}`);
+  const res = await axios.delete(`${NOTES_URL}/${ith}`,{
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
   return res;
 };
 
@@ -29,7 +34,11 @@ export const addRequest = async (post: PostParams) => {
 };
 
 export const updatePostRequest = async (ith: number, post: PostParams) => {
-  const res = await axios.put(NOTES_URL + "/" + ith, { post });
+  const res = await axios.put(NOTES_URL + "/" + ith, { post },{
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
   return res;
 };
 
@@ -40,8 +49,8 @@ export const setToken = (newToken: string) => {
 export const signup = async (name: String, email: String, un: String, pw: String) => {
   const res = await axios.post(SIGNUP_URL, {
     user: {
-      name: name,
-      email: email,
+      name,
+      email,
       username: un,
       password: pw
     }
@@ -52,13 +61,13 @@ export const signup = async (name: String, email: String, un: String, pw: String
       alert(res.status);
     }
   }).catch((err) => {
-    alert("cant creat user");
+    alert("cant create user");
     console.log(err)
   });
   return res;
 }
 
-export const login = async (un: String, pw: String, setIsLogedin: Function) => {
+export const login = async (un: String, pw: String, setIsLoggedin: Function) => {
   const res = await axios.post(LOGIN_URL, {
     user: {
       username: un,
@@ -68,9 +77,9 @@ export const login = async (un: String, pw: String, setIsLogedin: Function) => {
     if (res.status == 200) {
       alert("user logedin");
       setToken(res.data.token);
-      setIsLogedin(true);
-      console.log(res.data.token);
+      setIsLoggedin(true);
       name = res.data.name;
+      email = res.data.email;
     } else {
       alert(res.status);
     }
@@ -84,3 +93,5 @@ export const loginRap = (setlogin: Function): Function => {
   return (un: String, pw: String) => { login(un, pw, setlogin) }
 }
 export const getName = () => name;
+
+export const getEmail = () => email;

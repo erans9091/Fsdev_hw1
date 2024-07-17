@@ -5,7 +5,7 @@ const bcrypt = require("bcrypt");
 const User = require("../models/user");
 
 loginRouter.use((req, res, next) => {
-  logger.log(req.method, req.url, req.body);
+  logger.log(req.method, req.originalUrl, req.body);
   next();
 });
 

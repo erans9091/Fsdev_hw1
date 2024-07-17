@@ -3,18 +3,17 @@ const Note = require("../models/note");
 const logger = require("../utils/logger").initLogger();
 const jwt = require('jsonwebtoken')
 const User = require('../models/user');
-const { log } = require("console");
 
 const getTokenFrom = request => {
   const authorization = request.get('authorization')
   if (authorization && authorization.startsWith('Bearer ')) {
     return authorization.replace('Bearer ', '')
   }
-  return null
+  return "null"
 }
 
 notesRouter.use((req, res, next) => {
-  logger.log(req.method, req.url, req.body);
+  logger.log(req.method, req.originalUrl, req.body);
   next();
 });
 
@@ -61,7 +60,6 @@ notesRouter.post("/", async (req, res) => {
   if (!decodedToken.id) {
     return res.status(401).json({ error: 'token invalid' })
   }
-  const user = await User.findById(decodedToken.id)
   const newNote = req.body;
   if (!newNote) {
     return res.status(401).json({ error: 'post data undefined' });
@@ -70,23 +68,25 @@ notesRouter.post("/", async (req, res) => {
 
   const last = await Note.findOne().skip(count - 1);
   const lastId = last.id || 0;
-  console.log(newNote);
+
   await Note.create({ ...newNote, id: lastId + 1 })
     .then((obj) => res.status(201).send(obj._id))
     .catch(() => res.status(400).send("can't add"));
 });
 notesRouter.put("/:ith", async (req, res) => {
+  const decodedToken = jwt.verify(getTokenFrom(req), process.env.SECRET)
   if (!decodedToken.id) {
     return res.status(401).json({ error: 'token invalid' })
   }
   const ith = parseInt(req.params.ith);
-  const newNote = req.body.put;
+  const newNote = req.body.post;
 
   const note = await Note.findOne().skip(ith - 1);
   const user = await User.findById(decodedToken.id)
   if (note.author.name != user.name) {
     return res.status(403).json({ error: 'cant have access to this post' })
   }
+
   note
     ? updateNote(note._id, newNote)
       .then(res.status(201).send("note updated"))

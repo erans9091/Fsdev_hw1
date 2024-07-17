@@ -9,8 +9,9 @@ const Page = ({
   addPost,
   updatePost,
   deleteAction,
-  isLogin,
-  name
+  isLoggedin,
+  name,
+  email,
 }: {
   posts: PostParams[];
   pageNumber: number;
@@ -21,31 +22,34 @@ const Page = ({
     thenf: (res: any) => void
   ) => void;
   deleteAction: (ith: number) => void;
-  isLogin: boolean;
-  name: String;
+  isLoggedin: boolean;
+  name: string;
+  email: string;
 }) => {
   const [showAddForm, setShowAddForm] = useState(false);
   return (
     <div className="page">
       <h1>Page {pageNumber}</h1>
-      {posts.map((post, index) => (
+      {posts?.map((post, index) => (
         <Post
           post={post}
           key={post.id}
           updatePost={updatePost}
           ith={index + 1}
           deleteAction={deleteAction}
-          isLogin={isLogin}
+          isLoggedin={isLoggedin}
           name={name}
         />
       ))}
-      {showAddForm && isLogin ? (
+      {showAddForm && isLoggedin ? (
         <AddPostForm
           addPost={addPost}
           cancel_func={() => setShowAddForm(false)}
+          name={name}
+          email={email}
         />
       ) : (
-        <button onClick={() => isLogin && setShowAddForm(true)} name="add_new_note">
+        isLoggedin && <button onClick={() => isLoggedin && setShowAddForm(true)} name="add_new_note">
           Add a new note
         </button>
       )}

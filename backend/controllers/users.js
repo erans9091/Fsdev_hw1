@@ -4,7 +4,7 @@ const User = require("../models/user");
 const logger = require("../utils/logger").initLogger();
 
 usersRouter.use((req, res, next) => {
-  logger.log(req.method, req.url, req.body);
+  logger.log(req.method, req.originalUrl, req.body);
   next();
 });
 
