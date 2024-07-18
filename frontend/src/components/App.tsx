@@ -4,17 +4,18 @@ import { useState, useEffect } from "react";
 // Components
 import Page from "./Page";
 import Pagination from "./Pagination";
-import Header from "./Header";
 import SignupForm from "./SignupForm";
 import LoginForm from "./Login";
 // Types
 import { PostParams } from "../types";
+import type { Cache } from "../utils/cache";
 // Utils
 import {
   getPage,
   deletePost,
   addPost as addPostCacheWrap,
   updatePost as updatePostCacheWrap,
+  initCacheFromProp,
 } from "../utils/cache";
 
 import {
@@ -24,22 +25,26 @@ import {
   signup,
   loginRap as login,
 } from "../utils/fetchUtils";
+
+const postsPerPage = 10;
+
 const App = ({
-  posts: initialPosts,
   totalCount,
+  cache,
 }: {
-  posts: PostParams[];
   totalCount: number;
+  cache: Cache;
 }) => {
-  // console.log(script())
-  const [posts, setPosts] = useState<PostParams[]>(initialPosts);
+
+  useEffect(() => {
+    initCacheFromProp(cache);
+  }, [cache]);
+
+  const [posts, setPosts] = useState<PostParams[]>([]);
   const [currPage, setCurrPage] = useState(1);
   const [totalPosts, setTotalPosts] = useState(totalCount);
-  const [postsPerPage, setPostsPerPage] = useState(10);
   const [theme, setTheme] = useState("light");
   const [isLoggedin, setIsLoggedin] = useState(false);
-
-  const NOTES_URL = "http://localhost:3001/notes";
 
   useEffect(() => {
     getPage(
@@ -53,7 +58,7 @@ const App = ({
       .catch((error) => {
         console.log("Encountered an error:" + error);
       });
-  }, [currPage, postsPerPage, totalPosts]);
+  }, [currPage, totalPosts]);
 
   const calcPagesRange = () => {
     const maxPage = Math.ceil(totalPosts / postsPerPage);
@@ -64,11 +69,6 @@ const App = ({
       return [maxPage - 4, maxPage - 3, maxPage - 2, maxPage - 1, maxPage];
     }
     return [currPage - 2, currPage - 1, currPage, currPage + 1, currPage + 2];
-  };
-
-  const setPostsInPage = (numberOfPosts: number) => {
-    setCurrPage(1);
-    setPostsPerPage(numberOfPosts);
   };
 
   const addPost = async (post: PostParams) => {
@@ -98,8 +98,6 @@ const App = ({
     thenf: (res: any) => void
   ) => {
     const curith = postsPerPage * (currPage - 1) + ith;
-    // axios
-    //   .put(NOTES_URL + "/" + curith, { post })
     updatePostCacheWrap(curith, post, currPage)
       .then(thenf)
       .catch((error) => console.error("Error updating post:", error));
@@ -150,7 +148,6 @@ const App = ({
       >
         theme
       </button>
-      <Header postsPerPage={postsPerPage} setPostsPerPage={setPostsInPage} />
       <Page
         posts={posts}
         pageNumber={currPage}

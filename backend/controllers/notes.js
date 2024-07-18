@@ -25,6 +25,23 @@ const updateNote = async (id, newNote) => {
   await Note.findByIdAndUpdate(id, newNote);
 };
 
+let key = 0;
+const getIdCount = async () => {
+
+  while (key === 1) {
+    await new Promise(resolve => setTimeout(resolve, 50));
+  }
+  key = 1;
+  const count = await Note.collection.countDocuments();
+
+  const last = await Note.findOne().skip(count - 1);
+  const lastId = last.id || 0;
+  key = 0;
+  return lastId;
+};
+
+
+
 notesRouter.get("/", async (req, res) => {
   const { _page, _limit } = req.query;
   const page = parseInt(_page) || 1;
@@ -64,10 +81,11 @@ notesRouter.post("/", async (req, res) => {
   if (!newNote) {
     return res.status(401).json({ error: 'post data undefined' });
   }
-  const count = await Note.collection.countDocuments();
+  // const count = await Note.collection.countDocuments();
 
-  const last = await Note.findOne().skip(count - 1);
-  const lastId = last.id || 0;
+  lastId = await getIdCount();
+  // const last = await Note.findOne().skip(count - 1);
+  // const lastId = last.id || 0;
 
   await Note.create({ ...newNote, id: lastId + 1 })
     .then((obj) => res.status(201).send(obj._id))
