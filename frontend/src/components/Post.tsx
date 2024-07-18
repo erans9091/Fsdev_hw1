@@ -50,7 +50,7 @@ const Post = ({
   return (
     <div className="note" id={"" + post.id} key={post.id}>
       <h2>{post.title}</h2>
-      <h3>{post?.author?.name}</h3>
+      <h3 className="auther_name">{post?.author?.name}</h3>
       <p>{post.content}</p>
       {!isEdit && isMy() && (
         <button name={"edit-" + post.id} onClick={() => setIsEdit(true)}>

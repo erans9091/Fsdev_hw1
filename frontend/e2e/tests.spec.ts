@@ -1,5 +1,16 @@
 import { test, expect } from '@playwright/test';
 
+test("have note", async ({ page }) => {
+    await page.goto('http://localhost:3000'); // Change the URL to your app's login page
+    //await page.waitForResponse((response) => response.url().includes('http://localhost:3001/notes'))
+    const notesList = page.locator(".note");
+    await expect(notesList).not.toHaveCount(0);
+
+    await page.click("button[name='next']");
+    const notesList2 = page.locator(".note");
+    await expect(notesList2).not.toHaveCount(0);
+});
+
 test.describe("Signup and Login", () => {
     test('User can signup', async ({ page }) => {
         // Navigate to the signup page
@@ -13,16 +24,16 @@ test.describe("Signup and Login", () => {
 
         let responseStatus: number | undefined;
         page.on('response', response => {
-            if (response.url().includes('/signup')) {
+            if (response.url() === "http://localhost:3001/users") {
                 responseStatus = response.status();
             }
         });
 
         // Click the signup button
-        await page.click('button[type="submit"]');
+        await page.click('button[name="create_user_form_create_user"]');
 
         // Wait for the response to be captured
-        await page.waitForResponse(response => response.url().includes('/signup'));
+        await page.waitForResponse(response => response.url().includes('users'));
 
         // Check for status 201
         expect(responseStatus).toBe(201);
@@ -37,10 +48,8 @@ test.describe("Signup and Login", () => {
         await page.fill('input[name="login_form_username"]', 'testuser');
         await page.fill('input[name="login_form_password"]', 'Password123!');
 
-        const [response] = await Promise.all([
-            page.waitForResponse(response => response.url().includes('/login') && response.status() === 200),
-            page.click('button[type="submit"]')
-        ]);
+        await page.click('button[name="login_form_btn"]');
+        const response = await page.waitForResponse('http://localhost:3001/login');
 
         // Read and verify the response
         const responseBody = await response.json();
@@ -60,10 +69,11 @@ test('User can logout', async ({ page }) => {
     await page.fill('input[name="login_form_username"]', 'testuser');
     await page.fill('input[name="login_form_password"]', 'Password123!');
 
-    const [response] = await Promise.all([
-        page.waitForResponse(response => response.url().includes('/login') && response.status() === 200),
-        page.click('button[type="submit"]')
-    ]);
+    await page.click('button[name="login_form_btn"]');
+    const response = await page.waitForResponse('http://localhost:3001/login');
+
+    // Read and verify the response
+
     // Perform assertions on the response
     expect(response.status()).toBe(200);
     await page.click("button[name='add_new_note']");
@@ -84,43 +94,44 @@ test('Check if edit and delete not show', async ({ page }) => {
     const component2 = page.locator('[name^="delete-"]'); // Use ^= to match the start of the name attribute
     await expect(component2).toHaveCount(0);
 });
-test("add post", async ({ page }) => {
+test.only("add post", async ({ page }) => {
     await page.goto('http://localhost:3000'); // Change the URL to your app's login page
+    const resp = await page.waitForRequest((response) => response.url().includes('http://localhost:3001/notes'));
+    const totalCount = resp.headers()['x-total-count'];
+    const totalCount1 = resp.headers();
+    console.log(totalCount1);
     // Fill out the login form
     await page.fill('input[name="login_form_username"]', 'testuser');
     await page.fill('input[name="login_form_password"]', 'Password123!');
+    //click - send login request
+    await page.click('button[name="login_form_btn"]');
+    const response = await page.waitForResponse('http://localhost:3001/login');
 
-    const [response] = await Promise.all([
-        page.waitForResponse(response => response.url().includes('/login') && response.status() === 200),
-        page.click('button[type="submit"]')
-    ]);
-    // Perform assertions on the response
     expect(response.status()).toBe(200);
+
     await page.click("button[name='add_new_note']");
     await page.fill('input[name="text_input_title_new_note"]', 'test_post');
     await page.fill('input[name="text_input_new_note"]', 'test post data');
-    await page.fill('input[name="text_input_author_new_note"]', 'user1');
-    await page.fill('input[name="text_input_email_new_note"]', 'testuser@example.com');
 
-    await page.route('**/api/your-endpoint', (route) => {
-        route.fulfill({
-            status: 201,
-            contentType: 'application/json',
-            body: JSON.stringify({ message: 'Created' }),
-        });
-    });
-
-    // Click the save button
+    // Click the save button - send post request
     await page.click('button[name="text_input_save_new_note"]');
 
     // Verify that the status is 201
-    const [response1] = await Promise.all([
-        page.waitForResponse('**/api/your-endpoint'),
-    ]);
+    const response1 =
+        await page.waitForResponse((response) => {
+            return response.url() === 'http://localhost:3001/notes' && response.status() === 201;
+        })
 
     expect(response1.status()).toBe(201);
-    page.click("button[nme='last']");
-    const authorName = page.locator("h3");
-    await expect(authorName).toBeVisible();
-    await expect(authorName).toHaveText('Author Name');
+    const totalCountAfter = response.headers()['x-total-count'];
+    expect(+totalCount + 1).toBe(+totalCountAfter);
+    //jump to last page
+    await page.click("button[name='last']");
+    //await page.waitForResponse((response) => response.url().includes('http://localhost:3001/notes'))
+    const lastNote = page.locator(".note").last().locator(".auther_name")
+    await expect(lastNote).toHaveText('user1');
+    // await expect(lastNote).toBeVisible();
+    // const authorName = page.locator(".auther_name");
+    // await expect(authorName).toBeVisible();
+    // await expect(authorName).toHaveText('user1');
 });
