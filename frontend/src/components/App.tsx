@@ -131,10 +131,11 @@ const App = ({
 
   return (
     <div className={`app ${theme}`}>
-      {!isLoggedin && <SignupForm creatFunc={signup} />}
-      {!isLoggedin && <LoginForm loginFunc={login(setIsLoggedin)} />}
+      <SignupForm creatFunc={signup} />
+      <LoginForm loginFunc={login(setIsLoggedin)} />
       <br />
-      <button name="logout"
+      <button
+        name="logout"
         onClick={() => {
           setIsLoggedin(false);
           setToken("");
