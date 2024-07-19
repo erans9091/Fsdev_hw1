@@ -84,6 +84,9 @@ notesRouter.post("/", async (req, res) => {
   lastId = await getIdCount();
   // const last = await Note.findOne().skip(count - 1);
   // const lastId = last.id || 0;
+  lastId = await getIdCount();
+  // const last = await Note.findOne().skip(count - 1);
+  // const lastId = last.id || 0;
 
   await Note.create({ ...newNote, id: lastId + 1 })
     .then((obj) => res.status(201).send(obj._id))
