@@ -47,7 +47,7 @@ const Pagination = ({
       {pagesRange.map((i) => (
         <button
           key={"page-" + i}
-          onClick={() => handlePageChange(i)}
+          onClick={() => i <= maxPage && handlePageChange(i)}
           className={i === currPage ? "current" : ""}
           name={"page-" + i}
         >
