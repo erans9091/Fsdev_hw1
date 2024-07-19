@@ -43,7 +43,7 @@ test.describe("notes", () => {
     await page.fill('input[name="login_form_username"]', "testuser");
     await page.fill('input[name="login_form_password"]', "Password123!");
     //click - send login request
-    await page.click('button[name="login_form_btn"]');
+    await page.click('button[name="login_form_login"]');
     const response = await page.waitForResponse("http://localhost:3001/login");
 
     expect(response.status()).toBe(200);
@@ -118,7 +118,7 @@ test.describe("Signup and Login", () => {
     await page.fill('input[name="login_form_username"]', "testuser");
     await page.fill('input[name="login_form_password"]', "Password123!");
 
-    await page.click('button[name="login_form_btn"]');
+    await page.click('button[name="login_form_login"]');
     const response = await page.waitForResponse("http://localhost:3001/login");
 
     // Read and verify the response
@@ -138,7 +138,7 @@ test("User can logout", async ({ page }) => {
   await page.fill('input[name="login_form_username"]', "testuser");
   await page.fill('input[name="login_form_password"]', "Password123!");
 
-  await page.click('button[name="login_form_btn"]');
+  await page.click('button[name="login_form_login"]');
   const response = await page.waitForResponse("http://localhost:3001/login");
 
   // Read and verify the response
