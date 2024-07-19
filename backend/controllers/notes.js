@@ -9,7 +9,7 @@ const getTokenFrom = request => {
   if (authorization && authorization.startsWith('Bearer ')) {
     return authorization.replace('Bearer ', '')
   }
-  return "null"
+  return null;
 }
 
 notesRouter.use((req, res, next) => {
@@ -71,7 +71,11 @@ notesRouter.get("/", async (req, res, next) => {
   res.status(200).send("server is running!");
 });
 notesRouter.post("/", async (req, res) => {
-  const decodedToken = jwt.verify(getTokenFrom(req), process.env.SECRET)
+  const token = getTokenFrom(req)
+  if (!token) {
+    return res.status(401).json({ error: 'token missing' })
+  }
+  const decodedToken = jwt.verify(token, process.env.SECRET)
   if (!decodedToken.id) {
     return res.status(401).json({ error: 'token invalid' })
   }
@@ -93,7 +97,11 @@ notesRouter.post("/", async (req, res) => {
     .catch(() => res.status(400).send("can't add"));
 });
 notesRouter.put("/:ith", async (req, res) => {
-  const decodedToken = jwt.verify(getTokenFrom(req), process.env.SECRET)
+  const token = getTokenFrom(req)
+  if (!token) {
+    return res.status(401).json({ error: 'token missing' })
+  }
+  const decodedToken = jwt.verify(token, process.env.SECRET)
   if (!decodedToken.id) {
     return res.status(401).json({ error: 'token invalid' })
   }
@@ -113,7 +121,11 @@ notesRouter.put("/:ith", async (req, res) => {
     : res.status(404).send("note not found");
 });
 notesRouter.delete("/:ith", async (req, res) => {
-  const decodedToken = jwt.verify(getTokenFrom(req), process.env.SECRET)
+  const token = getTokenFrom(req)
+  if (!token) {
+    return res.status(401).json({ error: 'token missing' })
+  }
+  const decodedToken = jwt.verify(token, process.env.SECRET)
   if (!decodedToken.id) {
     return res.status(401).json({ error: 'token invalid' })
   }
