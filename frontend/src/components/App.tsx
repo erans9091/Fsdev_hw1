@@ -164,17 +164,6 @@ const App = ({
         pagesRange={calcPagesRange()}
         maxPage={Math.ceil(totalPosts / postsPerPage)}
       />
-      <button
-        onClick={() => {
-          updatePostCacheWrap(
-            1,
-            { title: "sample test", content: "sample test", author: { name: "sample test", email: "sample test" } },
-            1
-          );
-        }}
-      >
-        sample test send put req to notes you dont own
-      </button>
     </div>
   );
 };
