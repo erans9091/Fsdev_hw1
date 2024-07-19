@@ -1,4 +1,5 @@
 import { test, expect } from "@playwright/test";
+import { fetchPage } from "@/src/utils/fetchUtils";
 
 test.describe("notes", () => {
   test("have note", async ({ page }) => {
@@ -25,7 +26,7 @@ test.describe("notes", () => {
   test("add post (cannot run multiple times in parallel)", async ({ page }) => {
     await page.goto("http://localhost:3000"); // Change the URL to your app's login page
 
-    let totalCountBefore: number | undefined;
+    const totalCountBefore = +(await fetchPage(1)).headers["x-total-count"];
     let totalCountAfter: number | undefined;
     let setBefore = false;
 
@@ -33,12 +34,7 @@ test.describe("notes", () => {
       if (response.url().includes("http://localhost:3001/notes")) {
         const headers = response.headers();
         if (headers["x-total-count"]) {
-          if (!setBefore) {
-            totalCountBefore = parseInt(headers["x-total-count"]);
-            setBefore = true;
-          } else {
-            totalCountAfter = parseInt(headers["x-total-count"]);
-          }
+          totalCountAfter = parseInt(headers["x-total-count"]);
         }
       }
     });
@@ -71,11 +67,10 @@ test.describe("notes", () => {
     await page.waitForResponse((response) => {
       return response.url().includes("http://localhost:3001/notes");
     });
-    
 
     expect(response1.status()).toBe(201);
     const totalNotesBefore = totalCountBefore ? totalCountBefore : -1;
-    expect(totalNotesBefore+1).toBe(totalCountAfter);
+    expect(totalNotesBefore + 1).toBe(totalCountAfter);
     //jump to last page
     await page.click("button[name='last']");
     //await page.waitForResponse((response) => response.url().includes('http://localhost:3001/notes'))
